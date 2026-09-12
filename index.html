@@ -68,6 +68,7 @@
   }
   p { color: var(--ink-2); }
   strong { color: var(--ink); font-weight: 600; }
+  [hidden] { display: none !important; }
 
   .container { width: min(1120px, 100% - 40px); margin-inline: auto; }
   @media (min-width: 720px) { .container { width: min(1120px, 100% - 56px); } }
@@ -101,7 +102,8 @@
 
   /* Angka bergaya odometer: sel terpisah dengan garis tengah, angka tabular. JS mengisi tiap
      sel dengan strip vertikal 0-9 di balik jendela setinggi satu angka, jadi update menggulir
-     seperti odometer sungguhan — motif identitas produk di satu-satunya penghitung di halaman. */
+     seperti odometer sungguhan. Motif identitas produk yang sengaja diulang: penghitung galeri
+     dan penghitung langkah wizard cara-mulai. */
   .odo { display: inline-flex; background: #14202F; border-radius: 6px; padding: 4px 2px; }
   .odo-cell {
     color: #fff; font-weight: 700; font-size: 0.9rem; line-height: 1;
@@ -332,6 +334,34 @@
   .gal-static { display: grid; gap: 24px; }
   @media (min-width: 640px) { .gal-static { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); } }
   .gal-static figcaption { font-size: 0.85rem; color: var(--ink-2); margin-top: 8px; }
+
+  /* Wizard cara mulai: band putih menandai zona interaktif di antara dua section abu-abu.
+     Dengan JS, panel dan screenshot ditumpuk di satu sel grid sehingga tinggi stabil dan
+     pergantian langkah jadi crossfade; tanpa JS ketiga langkah tampil berurutan biasa. */
+  .wizard { background: var(--surface); border-block: 1px solid var(--line); }
+  .wiz-grid { display: grid; gap: 44px; align-items: center; }
+  @media (min-width: 880px) { .wiz-grid { grid-template-columns: 1.05fr 0.95fr; gap: 56px; } }
+  .wiz { margin-top: 22px; }
+  .wiz-counter { display: none; align-items: center; margin-bottom: 18px; }
+  html.js .wiz-counter { display: flex; }
+  .wiz-panel h3 { font-size: 1.45rem; margin-bottom: 10px; }
+  .wiz-panel p { max-width: 46ch; }
+  html.js .wiz-panels, html.js .wiz-shots { display: grid; }
+  html.js .wiz-panel { grid-area: 1 / 1; opacity: 0; visibility: hidden; }
+  html.js .wiz-panel.is-on { opacity: 1; visibility: visible; }
+  html.js .wiz-shot { grid-area: 1 / 1; opacity: 0; }
+  html.js .wiz-shot.is-on { opacity: 1; }
+  /* Pergantian langkah: panel baru naik-fade seperti caption galeri, panel lama memudar.
+     Transisi interaksi, sesuai dial MOTION halaman. */
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .wiz-panel { transition: opacity 0.3s ease, visibility 0s 0.3s; }
+    html.js .wiz-panel.is-on { transition-delay: 0s; animation: cap-in 0.35s ease; }
+    html.js .wiz-shot { transition: opacity 0.35s ease; }
+  }
+  .wiz-nav { display: none; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+  html.js .wiz-nav { display: flex; }
+  .wiz-phone { display: flex; justify-content: center; }
+  @media (min-width: 880px) { .wiz-phone { justify-content: flex-end; } }
 
   /* Privasi: satu-satunya band gelap, diberi ke pembeda terkuat produk agar hierarki terasa. */
   .privasi { background: var(--navy); }
@@ -613,6 +643,53 @@
     </div>
   </section>
 
+  <section class="wizard" id="mulai" aria-labelledby="mulai-h">
+    <div class="container wiz-grid">
+      <div class="reveal">
+        <span class="plate">Cara mulai</span>
+        <h2 id="mulai-h" style="margin: 14px 0 12px;">Tiga langkah pertamamu.</h2>
+        <p style="max-width: 46ch;">Alur pertama pemakaian CarBuddy, dibawakan langkah demi langkah.</p>
+        <div class="wiz" id="wiz" role="region" aria-label="Wizard cara mulai, tiga langkah" tabindex="0">
+          <div class="wiz-counter" aria-hidden="true">
+            <div class="odo"><span class="odo-cell" data-odo="0">0</span><span class="odo-cell" data-odo="1">1</span></div>
+            <span class="odo-rest">/ 03</span>
+          </div>
+          <div class="wiz-panels" aria-live="polite">
+            <div class="wiz-panel is-on">
+              <h3>Tambahkan kendaraan</h3>
+              <p>Isi nama, plat, dan odometer awal. Tidak ada akun yang diminta, catatannya langsung tersimpan di HP.</p>
+            </div>
+            <div class="wiz-panel">
+              <h3>Catat isi bensin dan servis</h3>
+              <p>Setiap catatan masuk ke timeline kendaraan, lengkap dengan biayanya. Konsumsi dihitung dari data asli, bukan perkiraan.</p>
+            </div>
+            <div class="wiz-panel">
+              <h3>Biarkan pengingat bekerja</h3>
+              <p>Atur rentang notifikasinya sekali. CarBuddy menghitung mundur dan mengingatkan sebelum jatuh tempo, tanpa server dan tanpa internet.</p>
+            </div>
+          </div>
+          <div class="wiz-nav">
+            <button class="btn btn-ghost" id="wiz-prev" type="button"><span class="ms" aria-hidden="true">chevron_left</span>Kembali</button>
+            <button class="btn btn-primary" id="wiz-next" type="button">Lanjut<span class="ms" aria-hidden="true">chevron_right</span></button>
+            <a class="btn btn-primary" id="wiz-cta" href="#unduh" hidden><span class="ms" aria-hidden="true">download</span>Unduh APK</a>
+          </div>
+        </div>
+      </div>
+      <div class="wiz-phone reveal">
+        <div class="phone phone-sm">
+          <div class="phone-screen">
+            <div class="wiz-shots">
+              <img class="wiz-shot is-on" src="images/home.jpg" alt="Beranda CarBuddy dengan kartu kendaraan Toyota Avanza berodometer 40.450 km" width="720" height="1560" decoding="async">
+              <img class="wiz-shot" src="images/timeline.jpg" alt="Tab Timeline berisi daftar catatan BBM, odometer, dan pengeluaran per kendaraan" width="720" height="1560" loading="lazy" decoding="async">
+              <img class="wiz-shot" src="images/reminders.jpg" alt="Tab Reminders dengan hitungan hari menuju jatuh tempo pajak dan pengingat lainnya" width="720" height="1560" loading="lazy" decoding="async">
+            </div>
+            <span class="punch" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="privasi on-dark" id="privasi" aria-labelledby="privasi-h">
     <div class="container">
       <div class="sec-head reveal">
@@ -757,7 +834,6 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 const track = document.getElementById('gal-track');
 const dotsWrap = document.getElementById('gal-dots');
 const captionEl = document.getElementById('gal-caption');
-const odoCells = document.querySelectorAll('[data-odo]');
 const gal = document.getElementById('gal');
 const n = SCREENSHOTS.length;
 const trackCfg = [SCREENSHOTS[n - 1]].concat(SCREENSHOTS, [SCREENSHOTS[0]]);
@@ -812,7 +888,7 @@ function update(i) {
     }
   }
   const num = String(i + 1).padStart(2, '0');
-  odoStrips.forEach((strip, k) => { strip.style.transform = 'translateY(' + (-Number(num[k])) + 'em)'; });
+  rollOdo(odoStrips, num);
 }
 
 // Pusat slide diukur dalam frame konten scroll track (rect + scrollLeft), bukan offsetLeft
@@ -986,27 +1062,68 @@ track.addEventListener('pointerup', endDrag);
 track.addEventListener('pointercancel', endDrag);
 
 // Isi tiap sel odometer dengan strip vertikal 0-9 di balik jendela setinggi satu angka:
-// update() cukup menggeser strip dan CSS yang menggulirkannya. Angka statis di HTML tetap
-// jadi tampilan fallback sebelum JS jalan.
-const odoStrips = [...odoCells].map((cell) => {
-  const win = document.createElement('span');
-  win.className = 'odo-win';
-  const strip = document.createElement('span');
-  strip.className = 'odo-strip';
-  for (let d = 0; d <= 9; d++) {
-    const digit = document.createElement('span');
-    digit.textContent = String(d);
-    strip.appendChild(digit);
-  }
-  win.appendChild(strip);
-  cell.textContent = '';
-  cell.appendChild(win);
-  return strip;
-});
+// pemakainya cukup menggeser strip dan CSS yang menggulirkannya. Angka statis di HTML tetap
+// jadi tampilan fallback sebelum JS jalan. Satu builder untuk semua instance (galeri + wizard).
+function buildOdoStrips(cells) {
+  return [...cells].map((cell) => {
+    const win = document.createElement('span');
+    win.className = 'odo-win';
+    const strip = document.createElement('span');
+    strip.className = 'odo-strip';
+    for (let d = 0; d <= 9; d++) {
+      const digit = document.createElement('span');
+      digit.textContent = String(d);
+      strip.appendChild(digit);
+    }
+    win.appendChild(strip);
+    cell.textContent = '';
+    cell.appendChild(win);
+    return strip;
+  });
+}
+function rollOdo(strips, num) {
+  strips.forEach((strip, k) => { strip.style.transform = 'translateY(' + (-Number(num[k])) + 'em)'; });
+}
+const odoStrips = buildOdoStrips(document.querySelectorAll('.gal-counter [data-odo]'));
+const wizStrips = buildOdoStrips(document.querySelectorAll('.wiz-counter [data-odo]'));
 
 // Posisi awal: slide asli pertama di tengah (child 0 adalah klon slide terakhir).
 update(0);
 track.scrollLeft = Math.max(slideCenter(track.children[1]) - track.clientWidth / 2, 0);
+
+// Wizard cara mulai: satu langkah tampil pada satu waktu; pindah langkah mem-fade panel dan
+// screenshot sambil odometer menggulir nomornya. Di langkah terakhir, Lanjut diganti CTA unduh
+// supaya wizard bermuara ke satu tindakan, bukan berhenti di ujung mati.
+const wizRoot = document.getElementById('wiz');
+const wizPrev = document.getElementById('wiz-prev');
+const wizNext = document.getElementById('wiz-next');
+const wizCta = document.getElementById('wiz-cta');
+const wizPanels = [...document.querySelectorAll('.wiz-panel')];
+const wizShots = [...document.querySelectorAll('.wiz-shot')];
+let wizI = 0;
+function wizUpdate() {
+  wizPanels.forEach((p, k) => p.classList.toggle('is-on', k === wizI));
+  wizShots.forEach((s, k) => {
+    s.classList.toggle('is-on', k === wizI);
+    s.setAttribute('aria-hidden', k === wizI ? 'false' : 'true');
+  });
+  rollOdo(wizStrips, String(wizI + 1).padStart(2, '0'));
+  wizPrev.hidden = wizI === 0;
+  const last = wizI === wizPanels.length - 1;
+  wizNext.hidden = last;
+  wizCta.hidden = !last;
+}
+function wizGo(next) {
+  const to = Math.max(0, Math.min(wizPanels.length - 1, next));
+  if (to !== wizI) { wizI = to; wizUpdate(); }
+}
+wizPrev.addEventListener('click', () => wizGo(wizI - 1));
+wizNext.addEventListener('click', () => wizGo(wizI + 1));
+wizRoot.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') { e.preventDefault(); wizGo(wizI - 1); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); wizGo(wizI + 1); }
+});
+wizUpdate();
 
 // Accordion FAQ
 document.querySelectorAll('.faq-q').forEach((btn) => {
