@@ -363,6 +363,126 @@
   .wiz-phone { display: flex; justify-content: center; }
   @media (min-width: 880px) { .wiz-phone { justify-content: flex-end; } }
 
+  /* Overlay onboarding: replika langkah pertama onboarding aplikasi (lib/features/onboarding),
+     teks, warna, dan perilakunya disamakan: tujuh segmen progres, logo mobil yang bisa
+     diketuk (getar + gelombang mesin menyala), dan tombol Mulai. Muncul sekali per browser
+     (ditandai di localStorage), dibuka lewat JS supaya tanpa JS landing tetap utuh. */
+  .ob {
+    position: fixed; inset: 0; z-index: 200;
+    background: var(--surface);
+    display: flex; flex-direction: column;
+  }
+  body.ob-lock { overflow: hidden; }
+  .ob-head { display: flex; padding: 18px 24px 8px; }
+  .ob-seg {
+    flex: 1; height: 4px; margin: 0 4px; border-radius: 999px;
+    background: rgba(13, 43, 82, 0.12);
+  }
+  /* Glow segmen aktif meniru aplikasi persis, bukan ornament baru. */
+  .ob-seg.is-on {
+    height: 8px; background: var(--blue);
+    box-shadow: 0 2px 6px rgba(0, 91, 191, 0.4);
+  }
+  .ob-body {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 16px 24px; max-width: 30rem; margin-inline: auto; width: 100%;
+  }
+  .ob-title { font-size: clamp(1.7rem, 5vw, 2.1rem); font-weight: 800; }
+  .ob-sub { margin-top: 10px; font-size: 0.98rem; max-width: 34ch; }
+  .ob-logo {
+    position: relative; width: 234px; height: 234px; margin-top: 34px;
+    background: none; border: 0; padding: 0; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ob-core {
+    position: absolute; inset: 0; margin: auto;
+    width: 130px; height: 130px; border-radius: 50%;
+    background: #fff; box-shadow: 0 18px 36px -16px rgba(13, 43, 82, 0.45);
+  }
+  .ob-core::after {
+    content: ""; position: absolute; inset: 8px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--blue-deep));
+  }
+  .ob-car {
+    position: absolute; inset: 0; z-index: 1; margin: auto;
+    width: 58px; height: 58px; line-height: 58px; text-align: center;
+    color: #fff; font-size: 58px;
+    font-variation-settings: "FILL" 1, "wght" 400, "opsz" 48;
+  }
+  .ob-bubble {
+    position: absolute; width: 40px; height: 40px; border-radius: 50%;
+    background: #fff; box-shadow: 0 8px 20px -14px rgba(13, 43, 82, 0.35);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--blue);
+  }
+  .ob-bubble .ms { font-size: 18px; font-variation-settings: "FILL" 1, "wght" 400, "opsz" 24; }
+  .ob-bubble.b0 { right: 25px; bottom: 25px; }
+  .ob-bubble.b1 { left: 25px; bottom: 25px; }
+  .ob-bubble.b2 { right: 25px; top: 25px; }
+  .ob-bubble.b3 { left: 25px; top: 25px; }
+  .ob-wave {
+    position: absolute; inset: 0; margin: auto; width: 156px; height: 156px;
+    border-radius: 50%; border: 2px solid rgba(0, 91, 191, 0.3);
+    opacity: 0; pointer-events: none;
+  }
+  .ob-wave.w2 { border-color: rgba(0, 91, 191, 0.2); }
+  .ob-wave.w3 { border-color: rgba(0, 91, 191, 0.1); }
+  .ob-hint {
+    margin-top: 26px; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.3px;
+    color: rgba(0, 91, 191, 0.8);
+  }
+  .ob-foot { display: flex; justify-content: flex-end; padding: 20px 24px 26px; }
+  .ob-start {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    min-height: 48px; padding: 12px 26px; border: 0; border-radius: 999px;
+    background: var(--blue); color: #fff;
+    font: 600 1rem var(--font-body); cursor: pointer;
+  }
+  .ob-start:hover { background: var(--blue-hover); }
+  .ob-start .ms { font-size: 15px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .ob { transition: opacity 0.3s ease; animation: ob-fade 0.25s ease; }
+    .ob.ob-out { opacity: 0; }
+    @keyframes ob-fade { from { opacity: 0; } }
+    /* Masuk seperti aplikasi: teks reveal, logo memantul elastic, gelembung fitur
+       bergiliran diagonal. Semuanya sekali jalan. */
+    .ob-title, .ob-sub, .ob-hint { animation: cap-in 0.5s ease backwards; }
+    .ob-sub { animation-delay: 0.1s; }
+    .ob-hint { animation-delay: 0.45s; }
+    .ob-core { animation: ob-core-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+    .ob-bubble { animation: ob-bubble-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+    .ob-bubble.b0 { animation-delay: 0.3s; --fx: -30px; --fy: -30px; }
+    .ob-bubble.b1 { animation-delay: 0.45s; --fx: 30px; --fy: -30px; }
+    .ob-bubble.b2 { animation-delay: 0.6s; --fx: -30px; --fy: 30px; }
+    .ob-bubble.b3 { animation-delay: 0.75s; --fx: 30px; --fy: 30px; }
+    /* Ketukan: getar mesin + pop skala, lalu tiga gelombang memuai dan memudar. */
+    .ob-logo.rev .ob-core { animation: ob-shake 0.4s ease-in-out, ob-pop 0.3s ease; }
+    .ob-logo.rev .ob-wave { animation: ob-wave-out 0.6s ease-out forwards; }
+    .ob-logo.rev .ob-wave.w2 { animation-duration: 0.8s; }
+    .ob-logo.rev .ob-wave.w3 { animation-duration: 1s; }
+    .ob-start:active { transform: translateY(1px); }
+  }
+  @keyframes ob-core-in { from { transform: scale(0.3); } }
+  @keyframes ob-bubble-in { from { opacity: 0; transform: translate(var(--fx, 0), var(--fy, 0)); } }
+  @keyframes ob-shake {
+    0%, 100% { transform: translateX(0) rotate(0); }
+    10% { transform: translateX(-3px) rotate(-2deg); }
+    20% { transform: translateX(3px) rotate(2deg); }
+    30% { transform: translateX(-3px) rotate(-1.5deg); }
+    45% { transform: translateX(3px) rotate(1.5deg); }
+    60% { transform: translateX(-2px) rotate(-1deg); }
+    80% { transform: translateX(2px) rotate(0.5deg); }
+  }
+  @keyframes ob-pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.12); }
+    100% { transform: scale(1); }
+  }
+  @keyframes ob-wave-out {
+    from { opacity: 0.9; transform: scale(0.8); }
+    to { opacity: 0; transform: scale(1.3); }
+  }
+
   /* Privasi: satu-satunya band gelap, diberi ke pembeda terkuat produk agar hierarki terasa. */
   .privasi { background: var(--navy); }
   .privasi .sec-head { max-width: 720px; }
@@ -796,6 +916,33 @@
   </div>
 </footer>
 
+<!-- Overlay onboarding: replika langkah pertama onboarding aplikasi. Tersembunyi secara default;
+     JS membukanya hanya pada kunjungan pertama browser (tanda di localStorage). -->
+<div class="ob" id="ob" role="dialog" aria-modal="true" aria-label="Selamat datang di CarBuddy" hidden>
+  <div class="ob-head" aria-hidden="true">
+    <span class="ob-seg is-on"></span><span class="ob-seg"></span><span class="ob-seg"></span><span class="ob-seg"></span><span class="ob-seg"></span><span class="ob-seg"></span><span class="ob-seg"></span>
+  </div>
+  <div class="ob-body">
+    <h2 class="ob-title">Selamat Datang!</h2>
+    <p class="ob-sub">CarBuddy akan membantu kamu mengelola kendaraan dengan lebih cerdas.</p>
+    <button class="ob-logo" id="ob-logo" type="button" aria-label="Ketuk mobil untuk menyalakan mesin">
+      <span class="ob-wave w1" aria-hidden="true"></span>
+      <span class="ob-wave w2" aria-hidden="true"></span>
+      <span class="ob-wave w3" aria-hidden="true"></span>
+      <span class="ob-bubble b2" aria-hidden="true"><span class="ms">payments</span></span>
+      <span class="ob-bubble b3" aria-hidden="true"><span class="ms">notifications</span></span>
+      <span class="ob-bubble b1" aria-hidden="true"><span class="ms">build</span></span>
+      <span class="ob-bubble b0" aria-hidden="true"><span class="ms">local_gas_station</span></span>
+      <span class="ob-core" aria-hidden="true"></span>
+      <span class="ob-car ms" aria-hidden="true">directions_car</span>
+    </button>
+    <p class="ob-hint">Ketuk mobil untuk menyalakan mesin!</p>
+  </div>
+  <div class="ob-foot">
+    <button class="ob-start" id="ob-start" type="button">Mulai<span class="ms" aria-hidden="true">arrow_forward_ios</span></button>
+  </div>
+</div>
+
 <script>
 document.documentElement.classList.add('js');
 
@@ -1176,6 +1323,56 @@ if ('IntersectionObserver' in window && !reduceMotion) {
   document.querySelectorAll('.reveal').forEach((el) => revIO.observe(el));
 } else {
   document.querySelectorAll('.reveal').forEach((el) => el.classList.add('in'));
+}
+
+// Overlay onboarding: replika langkah pertama onboarding aplikasi. Muncul sekali per browser
+// (ditandai di localStorage; kalau penyimpanan tak bisa diakses, overlay tidak pernah menghalangi),
+// tombol Mulai atau Escape menutupnya dan membeaskan landing.
+const ob = document.getElementById('ob');
+const obLogo = document.getElementById('ob-logo');
+const obStart = document.getElementById('ob-start');
+const OB_KEY = 'carbuddy_onboarded';
+let obPrevFocus = null;
+function obWasSeen() {
+  try { return localStorage.getItem(OB_KEY) === '1'; } catch (_) { return true; }
+}
+function obMarkSeen() {
+  try { localStorage.setItem(OB_KEY, '1'); } catch (_) {}
+}
+function obOpen() {
+  obPrevFocus = document.activeElement;
+  ob.hidden = false;
+  document.body.classList.add('ob-lock');
+  obStart.focus();
+}
+function obClose() {
+  obMarkSeen();
+  document.body.classList.remove('ob-lock');
+  const finish = () => {
+    ob.hidden = true;
+    ob.classList.remove('ob-out');
+    if (obPrevFocus instanceof HTMLElement && obPrevFocus !== document.body) obPrevFocus.focus();
+    else document.querySelector('.brand').focus();
+  };
+  if (reduceMotion) finish();
+  else { ob.classList.add('ob-out'); setTimeout(finish, 320); }
+}
+if (ob && obLogo && obStart && !obWasSeen()) {
+  obOpen();
+  obLogo.addEventListener('click', () => {
+    obLogo.classList.remove('rev');
+    void obLogo.offsetWidth;
+    obLogo.classList.add('rev');
+  });
+  obStart.addEventListener('click', obClose);
+  ob.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); obClose(); return; }
+    if (e.key !== 'Tab') return;
+    const ring = [obLogo, obStart];
+    const i = ring.indexOf(document.activeElement);
+    if (e.shiftKey && i <= 0) { e.preventDefault(); ring[1].focus(); }
+    else if (!e.shiftKey && i === ring.length - 1) { e.preventDefault(); ring[0].focus(); }
+  });
 }
 </script>
 </body>
