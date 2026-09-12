@@ -15,7 +15,7 @@
 <meta property="og:description" content="Odometer, BBM, servis, pajak, sampai asuransi tercatat rapi di HP sendiri. Gratis, tanpa akun, offline penuh.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://azmirizkifar20.github.io/get-carbuddy/">
-<meta property="og:image" content="https://azmirizkifar20.github.io/get-carbuddy/images/home.jpg">
+<meta property="og:image" content="https://azmirizkifar20.github.io/get-carbuddy/images/meta.png">
 <link rel="canonical" href="https://azmirizkifar20.github.io/get-carbuddy/">
 <link rel="icon" type="image/png" href="images/app_icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -431,9 +431,9 @@
   .ob-start:hover { background: var(--blue-hover); }
   .ob-start .ms { font-size: 15px; }
   @media (prefers-reduced-motion: no-preference) {
-    .ob { transition: opacity 0.3s ease, transform 0.35s ease; animation: ob-fade 0.25s ease; }
-    /* Keluar: memudar sambil melorot ke bawah, menyerahkan panggung ke landing. */
-    .ob.ob-out { opacity: 0; transform: translateY(32px); }
+    .ob { transition: transform 0.45s ease-in; animation: ob-fade 0.25s ease; }
+    /* Keluar: menggeser seluruh overlay ke atas sampai tuntas, menyerahkan panggung ke landing. */
+    .ob.ob-out { transform: translateY(-100%); }
     @keyframes ob-fade { from { opacity: 0; } }
     /* Masuk seperti aplikasi: teks reveal, logo memantul elastic, gelembung fitur
        bergiliran diagonal. Semuanya sekali jalan. */
@@ -790,8 +790,8 @@
         <div class="phone phone-sm">
           <div class="phone-screen">
             <div class="wiz-shots">
-              <img class="wiz-shot is-on" src="images/home.jpg" alt="Beranda CarBuddy dengan kartu kendaraan Toyota Avanza berodometer 40.450 km" width="720" height="1560" decoding="async">
-              <img class="wiz-shot" src="images/timeline.jpg" alt="Tab Timeline berisi daftar catatan BBM, odometer, dan pengeluaran per kendaraan" width="720" height="1560" loading="lazy" decoding="async">
+              <img class="wiz-shot is-on" src="images/tambah-kendaraan.jpg" alt="Formulir Tambah Kendaraan di aplikasi CarBuddy: merek Toyota, model Avanza, tahun 2020, dan plat nomor B 1234 XYZ" width="1080" height="2340" decoding="async">
+              <img class="wiz-shot" src="images/tambah-bensin.jpg" alt="Formulir Catat Pengisian BBM di aplikasi CarBuddy: Toyota Avanza, 12 September 2026, Pertalite 10 liter dengan total Rp 100.000" width="1080" height="2340" loading="lazy" decoding="async">
               <img class="wiz-shot" src="images/reminders.jpg" alt="Tab Reminders dengan hitungan hari menuju jatuh tempo pajak dan pengingat lainnya" width="720" height="1560" loading="lazy" decoding="async">
             </div>
             <span class="punch" aria-hidden="true"></span>
@@ -1312,7 +1312,7 @@ if ('IntersectionObserver' in window && !reduceMotion) {
 }
 
 // Overlay onboarding: replika langkah pertama onboarding aplikasi. Tampil di setiap muat halaman;
-// tombol Mulai atau Escape menutupnya dengan fade + slide ke bawah dan membeaskan landing.
+// tombol Mulai atau Escape menutupnya dengan slide ke atas dan membeaskan landing.
 const ob = document.getElementById('ob');
 const obLogo = document.getElementById('ob-logo');
 const obStart = document.getElementById('ob-start');
@@ -1332,7 +1332,7 @@ function obClose() {
     else document.querySelector('.brand').focus();
   };
   if (reduceMotion) finish();
-  else { ob.classList.add('ob-out'); setTimeout(finish, 360); }
+  else { ob.classList.add('ob-out'); setTimeout(finish, 470); }
 }
 if (ob && obLogo && obStart) {
   obOpen();
