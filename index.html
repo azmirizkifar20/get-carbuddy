@@ -364,25 +364,15 @@
   @media (min-width: 880px) { .wiz-phone { justify-content: flex-end; } }
 
   /* Overlay onboarding: replika langkah pertama onboarding aplikasi (lib/features/onboarding),
-     teks, warna, dan perilakunya disamakan: tujuh segmen progres, logo mobil yang bisa
-     diketuk (getar + gelombang mesin menyala), dan tombol Mulai. Muncul sekali per browser
-     (ditandai di localStorage), dibuka lewat JS supaya tanpa JS landing tetap utuh. */
+     teks, warna, dan perilakunya disamakan: logo mobil yang bisa diketuk (getar + gelombang
+     mesin menyala) dan tombol Mulai. Tampil di setiap muat halaman, dibuka lewat JS supaya
+     tanpa JS landing tetap utuh. */
   .ob {
     position: fixed; inset: 0; z-index: 200;
     background: var(--surface);
     display: flex; flex-direction: column;
   }
   body.ob-lock { overflow: hidden; }
-  .ob-head { display: flex; padding: 18px 24px 8px; }
-  .ob-seg {
-    flex: 1; height: 4px; margin: 0 4px; border-radius: 999px;
-    background: rgba(13, 43, 82, 0.12);
-  }
-  /* Glow segmen aktif meniru aplikasi persis, bukan ornament baru. */
-  .ob-seg.is-on {
-    height: 8px; background: var(--blue);
-    box-shadow: 0 2px 6px rgba(0, 91, 191, 0.4);
-  }
   .ob-body {
     flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-align: center; padding: 16px 24px; max-width: 30rem; margin-inline: auto; width: 100%;
@@ -431,9 +421,9 @@
     margin-top: 26px; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.3px;
     color: rgba(0, 91, 191, 0.8);
   }
-  .ob-foot { display: flex; justify-content: flex-end; padding: 20px 24px 26px; }
   .ob-start {
     display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    margin-top: 34px;
     min-height: 48px; padding: 12px 26px; border: 0; border-radius: 999px;
     background: var(--blue); color: #fff;
     font: 600 1rem var(--font-body); cursor: pointer;
@@ -441,8 +431,9 @@
   .ob-start:hover { background: var(--blue-hover); }
   .ob-start .ms { font-size: 15px; }
   @media (prefers-reduced-motion: no-preference) {
-    .ob { transition: opacity 0.3s ease; animation: ob-fade 0.25s ease; }
-    .ob.ob-out { opacity: 0; }
+    .ob { transition: opacity 0.3s ease, transform 0.35s ease; animation: ob-fade 0.25s ease; }
+    /* Keluar: memudar sambil melorot ke bawah, menyerahkan panggung ke landing. */
+    .ob.ob-out { opacity: 0; transform: translateY(32px); }
     @keyframes ob-fade { from { opacity: 0; } }
     /* Masuk seperti aplikasi: teks reveal, logo memantul elastic, gelembung fitur
        bergiliran diagonal. Semuanya sekali jalan. */
@@ -917,11 +908,8 @@
 </footer>
 
 <!-- Overlay onboarding: replika langkah pertama onboarding aplikasi. Tersembunyi secara default;
-     JS membukanya hanya pada kunjungan pertama browser (tanda di localStorage). -->
+     JS membukanya di setiap muat halaman. -->
 <div class="ob" id="ob" role="dialog" aria-modal="true" aria-label="Selamat datang di CarBuddy" hidden>
-  <div class="ob-head" aria-hidden="true">
-    <span class="ob-seg is-on"></span><span class="ob-seg"></span><span class="ob-seg"></span><span class="ob-seg"></span><span class="ob-seg"></span><span class="ob-seg"></span><span class="ob-seg"></span>
-  </div>
   <div class="ob-body">
     <h2 class="ob-title">Selamat Datang!</h2>
     <p class="ob-sub">CarBuddy akan membantu kamu mengelola kendaraan dengan lebih cerdas.</p>
@@ -937,8 +925,6 @@
       <span class="ob-car ms" aria-hidden="true">directions_car</span>
     </button>
     <p class="ob-hint">Ketuk mobil untuk menyalakan mesin!</p>
-  </div>
-  <div class="ob-foot">
     <button class="ob-start" id="ob-start" type="button">Mulai<span class="ms" aria-hidden="true">arrow_forward_ios</span></button>
   </div>
 </div>
@@ -1325,20 +1311,12 @@ if ('IntersectionObserver' in window && !reduceMotion) {
   document.querySelectorAll('.reveal').forEach((el) => el.classList.add('in'));
 }
 
-// Overlay onboarding: replika langkah pertama onboarding aplikasi. Muncul sekali per browser
-// (ditandai di localStorage; kalau penyimpanan tak bisa diakses, overlay tidak pernah menghalangi),
-// tombol Mulai atau Escape menutupnya dan membeaskan landing.
+// Overlay onboarding: replika langkah pertama onboarding aplikasi. Tampil di setiap muat halaman;
+// tombol Mulai atau Escape menutupnya dengan fade + slide ke bawah dan membeaskan landing.
 const ob = document.getElementById('ob');
 const obLogo = document.getElementById('ob-logo');
 const obStart = document.getElementById('ob-start');
-const OB_KEY = 'carbuddy_onboarded';
 let obPrevFocus = null;
-function obWasSeen() {
-  try { return localStorage.getItem(OB_KEY) === '1'; } catch (_) { return true; }
-}
-function obMarkSeen() {
-  try { localStorage.setItem(OB_KEY, '1'); } catch (_) {}
-}
 function obOpen() {
   obPrevFocus = document.activeElement;
   ob.hidden = false;
@@ -1346,7 +1324,6 @@ function obOpen() {
   obStart.focus();
 }
 function obClose() {
-  obMarkSeen();
   document.body.classList.remove('ob-lock');
   const finish = () => {
     ob.hidden = true;
@@ -1355,9 +1332,9 @@ function obClose() {
     else document.querySelector('.brand').focus();
   };
   if (reduceMotion) finish();
-  else { ob.classList.add('ob-out'); setTimeout(finish, 320); }
+  else { ob.classList.add('ob-out'); setTimeout(finish, 360); }
 }
-if (ob && obLogo && obStart && !obWasSeen()) {
+if (ob && obLogo && obStart) {
   obOpen();
   obLogo.addEventListener('click', () => {
     obLogo.classList.remove('rev');
