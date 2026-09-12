@@ -3,7 +3,7 @@
   CarBuddy, landing page.
   Design read: landing produk untuk pemilik kendaraan pribadi Indonesia,
   bahasa visual "buku servis modern" (terang, rapi, motif plat & odometer).
-  Dial: ENERGY 2 / RHYTHM 2 / MOTION 2 (reveal sekali jalan, tanpa loop).
+  Dial: ENERGY 2 / RHYTHM 2 / MOTION 2 (reveal sekali jalan + transisi interaksi, tanpa loop).
 -->
 <html lang="id">
 <head>
@@ -99,13 +99,21 @@
   .plate::before { content: ""; width: 7px; border-radius: 2px; background: var(--blue); }
   .on-dark .plate { background: transparent; border-color: #fff; color: #fff; }
 
-  /* Angka bergaya odometer: sel terpisah dengan garis tengah, angka tabular. */
+  /* Angka bergaya odometer: sel terpisah dengan garis tengah, angka tabular. JS mengisi tiap
+     sel dengan strip vertikal 0-9 di balik jendela setinggi satu angka, jadi update menggulir
+     seperti odometer sungguhan — motif identitas produk di satu-satunya penghitung di halaman. */
   .odo { display: inline-flex; background: #14202F; border-radius: 6px; padding: 4px 2px; }
   .odo-cell {
     color: #fff; font-weight: 700; font-size: 0.9rem; line-height: 1;
     padding: 4px 5px; font-variant-numeric: tabular-nums;
   }
   .odo-cell + .odo-cell { border-left: 1px solid rgba(255,255,255,0.28); }
+  .odo-win { display: block; height: 1em; overflow: hidden; }
+  .odo-strip { display: block; }
+  .odo-strip > span { display: block; height: 1em; line-height: 1; }
+  @media (prefers-reduced-motion: no-preference) {
+    .odo-strip { transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+  }
   .odo-rest { color: var(--ink-2); font-weight: 600; font-size: 0.9rem; align-self: center; margin-left: 8px; }
 
   .btn {
@@ -118,6 +126,11 @@
   .btn-primary:hover { background: var(--blue-hover); }
   .btn-ghost { background: var(--surface); color: var(--blue-deep); border-color: var(--blue); }
   .btn-ghost:hover { background: var(--blue-tint); }
+  /* Umpan balik tekan: tombol tenggelam 1px saat aktif, konfirmasi sentuhan yang murah tapi terasa. */
+  @media (prefers-reduced-motion: no-preference) {
+    .btn { transition: transform 0.15s ease; }
+    .btn:active { transform: translateY(1px); }
+  }
   .btn-lg { min-height: 56px; padding: 16px 30px; font-size: 1.05rem; border-radius: 14px; }
 
   /* Marka jalan: garis putus pemisah section, satu-satunya ornamen garis. */
@@ -295,6 +308,11 @@
     min-height: 3em; text-align: center; max-width: 52ch; margin-inline: auto;
     font-size: 0.98rem;
   }
+  /* Caption berganti dengan crossfade kecil tiap pindah slide, bukan bertukar mentah. */
+  @media (prefers-reduced-motion: no-preference) {
+    .gal-caption.swap { animation: cap-in 0.35s ease; }
+    @keyframes cap-in { from { opacity: 0; transform: translateY(4px); } }
+  }
   .gal-nav { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 8px; }
   .gal-arrow {
     display: inline-flex; align-items: center; justify-content: center;
@@ -369,11 +387,28 @@
   .foot-links { margin-left: auto; display: flex; gap: 20px; }
   .foot-links a { color: var(--blue-deep); font-size: 0.9rem; font-weight: 500; text-decoration: none; }
   .foot-links a:hover { text-decoration: underline; }
+  /* Ponsel: footer jadi satu kolom rata kiri — margin-left:auto milik desktop menggantungkan
+     email sendirian di tepi kanan begitu baris patah. Link email diberi tinggi sentuh 44px.
+     Override diletakkan setelah aturan dasar .foot-in agar align-items tidak ketimpa. */
+  @media (max-width: 719px) {
+    .foot-in { flex-direction: column; align-items: flex-start; }
+    .foot-links { margin-left: 0; }
+    .foot-links a { display: inline-block; padding: 12px 0; }
+  }
 
   /* Reveal: fade + naik kecil, sekali jalan, hanya saat JS aktif dan user tak mematikan motion. */
   @media (prefers-reduced-motion: no-preference) {
     html.js .reveal { opacity: 0; transform: translateY(14px); }
     html.js .reveal.in { opacity: 1; transform: none; transition: opacity 0.5s ease, transform 0.5s ease; }
+    /* Hero: anak-anaknya masuk bergiliran (judul → sub → CTA → fakta) supaya urutan fokus
+       pembaca terpandu; mockup HP menyusul belakangan. Tetap sekali jalan, tanpa loop. */
+    html.js .reveal.stagger { opacity: 1; transform: none; transition: none; }
+    html.js .stagger:not(.in) > * { opacity: 0; transform: translateY(14px); }
+    html.js .stagger.in > * { opacity: 1; transform: none; transition: opacity 0.5s ease, transform 0.5s ease; }
+    html.js .stagger.in > *:nth-child(2) { transition-delay: 0.08s; }
+    html.js .stagger.in > *:nth-child(3) { transition-delay: 0.16s; }
+    html.js .stagger.in > *:nth-child(4) { transition-delay: 0.24s; }
+    html.js .hero-phone.in { transition-delay: 0.15s; }
   }
 </style>
 </head>
@@ -413,7 +448,7 @@
   <section class="hero" id="top" aria-label="Perkenalan">
     <div class="container">
       <div class="hero-grid">
-        <div class="reveal">
+        <div class="reveal stagger">
           <h1>Kapan servis berikutnya? <span>Sudah tercatat.</span></h1>
           <p class="hero-sub">Odometer, BBM, servis, pajak, sampai asuransi tercatat rapi di satu aplikasi, di HP-mu sendiri.</p>
           <div class="hero-cta">
@@ -767,9 +802,17 @@ function update(i) {
     el.setAttribute('aria-hidden', on ? 'false' : 'true');
   });
   dots.forEach((d, k) => d.setAttribute('aria-current', k === i ? 'true' : 'false'));
-  captionEl.textContent = SCREENSHOTS[i].caption;
+  const cap = SCREENSHOTS[i].caption;
+  if (captionEl.textContent !== cap) {
+    captionEl.textContent = cap;
+    if (!reduceMotion) {
+      captionEl.classList.remove('swap');
+      void captionEl.offsetWidth;
+      captionEl.classList.add('swap');
+    }
+  }
   const num = String(i + 1).padStart(2, '0');
-  odoCells.forEach((cell, k) => { cell.textContent = num[k]; });
+  odoStrips.forEach((strip, k) => { strip.style.transform = 'translateY(' + (-Number(num[k])) + 'em)'; });
 }
 
 // Pusat slide diukur dalam frame konten scroll track (rect + scrollLeft), bukan offsetLeft
@@ -859,7 +902,20 @@ function step(dir) {
 }
 
 let rafPending = false;
+// Gulir sentuh bisa berhenti tepat di klon ujung (hasil snap momentum). Setelah gerakan benar-benar
+// selesai, klon harus dinormalkan ke slide asli padanannya — kalau tidak, swipe berikutnya menabrak
+// ujung fisik track dan galeri terasa macet di HP.
+let settleTimer = null;
+let touchActive = false;
+function armSettle() {
+  clearTimeout(settleTimer);
+  settleTimer = setTimeout(() => {
+    if (suppress || touchActive || dragging) return;
+    normalizePosition();
+  }, 140);
+}
 track.addEventListener('scroll', () => {
+  armSettle();
   if (suppress || rafPending) return;
   rafPending = true;
   requestAnimationFrame(() => {
@@ -872,12 +928,17 @@ track.addEventListener('scroll', () => {
 
 // Sentuhan saat animasi berjalan membatalkannya supaya geser manual tidak berkelahi dengan rAF.
 track.addEventListener('touchstart', () => {
+  touchActive = true;
+  clearTimeout(settleTimer);
   if (suppress) {
     cancelAnimationFrame(animId);
     suppress = false;
     track.classList.remove('no-snap');
   }
 }, { passive: true });
+const touchDone = () => { touchActive = false; armSettle(); };
+track.addEventListener('touchend', touchDone, { passive: true });
+track.addEventListener('touchcancel', touchDone, { passive: true });
 
 document.getElementById('gal-prev').addEventListener('click', () => step(-1));
 document.getElementById('gal-next').addEventListener('click', () => step(1));
@@ -887,7 +948,7 @@ gal.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
 });
 
-// Drag mouse di desktop; sentuh sudah ditangani scroll-snap native.
+// Drag mouse di desktop; sentuh memakai scroll-snap native, dan istirahat di klon dirapikan armSettle.
 let dragging = false, dragStartX = 0, dragStartLeft = 0;
 track.addEventListener('pointerdown', (e) => {
   if (e.pointerType !== 'mouse') return;
@@ -923,6 +984,25 @@ function endDrag() {
 }
 track.addEventListener('pointerup', endDrag);
 track.addEventListener('pointercancel', endDrag);
+
+// Isi tiap sel odometer dengan strip vertikal 0-9 di balik jendela setinggi satu angka:
+// update() cukup menggeser strip dan CSS yang menggulirkannya. Angka statis di HTML tetap
+// jadi tampilan fallback sebelum JS jalan.
+const odoStrips = [...odoCells].map((cell) => {
+  const win = document.createElement('span');
+  win.className = 'odo-win';
+  const strip = document.createElement('span');
+  strip.className = 'odo-strip';
+  for (let d = 0; d <= 9; d++) {
+    const digit = document.createElement('span');
+    digit.textContent = String(d);
+    strip.appendChild(digit);
+  }
+  win.appendChild(strip);
+  cell.textContent = '';
+  cell.appendChild(win);
+  return strip;
+});
 
 // Posisi awal: slide asli pertama di tengah (child 0 adalah klon slide terakhir).
 update(0);
