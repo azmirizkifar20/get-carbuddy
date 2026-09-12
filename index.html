@@ -60,8 +60,12 @@
   }
   img { max-width: 100%; display: block; }
   h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; letter-spacing: -0.01em; }
-  h2 { font-size: clamp(1.7rem, 2.4vw + 0.9rem, 2.3rem); font-weight: 700; }
+  h2 { font-size: clamp(1.5rem, 2.4vw + 0.85rem, 2.3rem); font-weight: 700; }
   h3 { font-size: 1.25rem; font-weight: 700; }
+  /* Ponsel: langkah tipe lebih kecil (root 15px). Target sentuh berbasis px tidak ikut menyusut. */
+  @media (max-width: 719px) {
+    html { font-size: 93.75%; }
+  }
   p { color: var(--ink-2); }
   strong { color: var(--ink); font-weight: 600; }
 
@@ -176,7 +180,7 @@
   .hero-grid { display: grid; gap: 44px; align-items: center; }
   @media (min-width: 880px) { .hero-grid { grid-template-columns: 1.05fr 0.95fr; gap: 56px; } }
   .hero h1 {
-    font-size: clamp(2.2rem, 4.2vw + 1rem, 3.4rem);
+    font-size: clamp(1.9rem, 4.2vw + 0.9rem, 3.4rem);
     font-weight: 800; margin: 14px 0 18px;
   }
   .hero h1 span { color: var(--blue); }
@@ -267,15 +271,16 @@
   .gal {
     outline-offset: 4px;
   }
-  .gal-track {
-    display: flex; gap: 20px;
+  .gal-track { display: flex; gap: 20px;
     overflow-x: auto; scroll-snap-type: x mandatory;
     padding: 12px calc(50% - var(--slide-w) / 2) 28px;
     scrollbar-width: none; cursor: grab;
   }
   .gal-track::-webkit-scrollbar { display: none; }
-  .gal-track.dragging { scroll-snap-type: none; cursor: grabbing; }
+  .gal-track.dragging { cursor: grabbing; }
   .gal-track.dragging .gal-slide { pointer-events: none; }
+  /* Snap dimatikan selama drag dan animasi programatik supaya tidak berkelahi dengan scrollLeft. */
+  .gal-track.dragging, .gal-track.no-snap { scroll-snap-type: none; }
   .gal-slide {
     flex: 0 0 auto; width: var(--slide-w); scroll-snap-align: center;
     transition: opacity 0.25s ease, transform 0.25s ease;
@@ -516,7 +521,7 @@
           <div class="feat-icon"><span class="ms" aria-hidden="true">directions_car</span></div>
           <div>
             <h3>Bebas jumlah kendaraan</h3>
-            <p>Mobil dan motor bisa campur. Tiap catatan ditandai milik kendaraan mana.</p>
+            <p>Tambah beberapa mobil sekaligus. Tiap catatan ditandai milik kendaraan mana.</p>
           </div>
         </div>
         <div class="feat-row reveal">
@@ -637,7 +642,7 @@
       <div class="faq-item reveal">
         <h3><button class="faq-q" id="faq-q5" aria-expanded="false" aria-controls="faq-a5">Bisa untuk lebih dari satu kendaraan?<span class="ms" aria-hidden="true">expand_more</span></button></h3>
         <div class="faq-a" id="faq-a5" role="region" aria-labelledby="faq-q5">
-          <div class="faq-a-inner"><p>Bisa. Mobil dan motor bisa dicampur dalam satu aplikasi. Setiap catatan ditandai milik kendaraan mana, dan ringkasan di Beranda menunjukkan semuanya.</p></div>
+          <div class="faq-a-inner"><p>Bisa. Beberapa mobil bisa dicatat dalam satu aplikasi. Setiap catatan ditandai milik kendaraan mana, dan ringkasan di Beranda menunjukkan semuanya.</p></div>
         </div>
       </div>
       <div class="faq-item reveal">
@@ -659,7 +664,7 @@
       <div class="reveal">
         <!-- TODO: setelah APK rilis publik, ganti mailto ini dengan link unduhan (Play Store / GitHub Releases). -->
         <a class="btn btn-primary btn-lg" href="mailto:dev@azmirf.my.id?subject=Minta%20APK%20CarBuddy"><span class="ms" aria-hidden="true">download</span>Unduh APK</a>
-        <p class="cta-note">Tautan unduhan publik belum dipasang. Tombol di atas mengirim permintaan APK lewat email pengembang.</p>
+        <p class="cta-note">Tombol di atas membuka draf email ke pengembang, dan file APK dikirim balik ke emailmu.</p>
       </div>
     </div>
   </section>
@@ -713,41 +718,53 @@ const SCREENSHOTS = [
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Galeri: slide dan dot dibangun dari SCREENSHOTS supaya caption dan alt editnya di satu tempat.
+// Ujung track diberi klon slide terakhir & pertama supaya next/prev loop mulus (infinite).
 const track = document.getElementById('gal-track');
 const dotsWrap = document.getElementById('gal-dots');
 const captionEl = document.getElementById('gal-caption');
 const odoCells = document.querySelectorAll('[data-odo]');
 const gal = document.getElementById('gal');
-const slides = [];
+const n = SCREENSHOTS.length;
+const trackCfg = [SCREENSHOTS[n - 1]].concat(SCREENSHOTS, [SCREENSHOTS[0]]);
 const dots = [];
-let active = 0;
+let active = 0;       // index ASLI (0..n-1) yang tampil di UI
+let suppress = false; // true selama animasi programatik: scroll listener tidak menulis UI
+let animId = null;
 
-SCREENSHOTS.forEach((s, i) => {
+const realFromTrack = (k) => (k <= 0 ? n - 1 : k > n ? 0 : k - 1);
+const trackFromReal = (r) => r + 1;
+
+function makeSlide(cfg, k) {
   const fig = document.createElement('figure');
   fig.className = 'gal-slide';
+  fig.dataset.real = String(realFromTrack(k));
   fig.innerHTML =
     '<div class="phone"><div class="phone-screen">' +
-    '<img src="' + s.src + '" alt="' + s.alt + '" width="720" height="1560"' +
-    (i ? ' loading="lazy"' : '') + ' decoding="async">' +
+    '<img src="' + cfg.src + '" alt="' + cfg.alt + '" width="720" height="1560"' +
+    (k === 1 ? '' : ' loading="lazy"') + ' decoding="async">' +
     '<span class="punch" aria-hidden="true"></span></div></div>';
-  fig.addEventListener('click', () => { if (i !== active) go(i); });
-  track.appendChild(fig);
-  slides.push(fig);
+  fig.addEventListener('click', () => goReal(realFromTrack(k)));
+  return fig;
+}
+trackCfg.forEach((cfg, k) => track.appendChild(makeSlide(cfg, k)));
 
+SCREENSHOTS.forEach((s, i) => {
   const dot = document.createElement('button');
   dot.className = 'gal-dot';
   dot.type = 'button';
-  dot.setAttribute('aria-label', 'Screenshot ' + (i + 1) + ' dari ' + SCREENSHOTS.length + ': ' + s.caption);
-  dot.addEventListener('click', () => go(i));
+  dot.setAttribute('aria-label', 'Screenshot ' + (i + 1) + ' dari ' + n + ': ' + s.caption);
+  dot.addEventListener('click', () => goReal(i));
   dotsWrap.appendChild(dot);
   dots.push(dot);
 });
 
+// update() selalu menerima index ASLI; klon yang mewakili slide itu ikut menyala saat transit.
 function update(i) {
   active = i;
-  slides.forEach((el, k) => {
-    el.classList.toggle('is-active', k === i);
-    el.setAttribute('aria-hidden', k === i ? 'false' : 'true');
+  Array.prototype.forEach.call(track.children, (el) => {
+    const on = Number(el.dataset.real) === i;
+    el.classList.toggle('is-active', on);
+    el.setAttribute('aria-hidden', on ? 'false' : 'true');
   });
   dots.forEach((d, k) => d.setAttribute('aria-current', k === i ? 'true' : 'false'));
   captionEl.textContent = SCREENSHOTS[i].caption;
@@ -763,44 +780,115 @@ function slideCenter(el) {
   return er.left + er.width / 2 - tr.left + track.scrollLeft;
 }
 
-function go(i) {
-  update(i);
-  const el = slides[i];
-  const left = slideCenter(el) - track.clientWidth / 2;
-  track.scrollTo({ left: Math.max(left, 0), behavior: reduceMotion ? 'auto' : 'smooth' });
-}
-
-function nearest() {
+function nearestTrack() {
   const center = track.scrollLeft + track.clientWidth / 2;
   let best = 0, bd = Infinity;
-  slides.forEach((el, k) => {
+  Array.prototype.forEach.call(track.children, (el, k) => {
     const d = Math.abs(slideCenter(el) - center);
     if (d < bd) { bd = d; best = k; }
   });
   return best;
 }
 
+// Animasi manual rAF + easing, bukan scroll-behavior:smooth: snap dimatikan selama terbang agar
+// tidak ada koreksi snap di tengah jalan, dan UI hanya di-update sekali di awal (tanpa kedip).
+function animateTo(target, opts = {}) {
+  cancelAnimationFrame(animId);
+  const el = track.children[target];
+  const to = Math.max(slideCenter(el) - track.clientWidth / 2, 0);
+  const jump = () => {
+    track.classList.add('no-snap');
+    track.scrollLeft = to;
+    track.classList.remove('no-snap');
+    if (opts.done) opts.done();
+  };
+  const from = track.scrollLeft;
+  if (opts.instant || reduceMotion || Math.abs(to - from) < 1) { jump(); return; }
+  const dur = Math.min(650, Math.max(340, Math.abs(to - from) * 0.45));
+  const t0 = performance.now();
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  suppress = true;
+  track.classList.add('no-snap');
+  const fly = (now) => {
+    const p = Math.min(1, (now - t0) / dur);
+    track.scrollLeft = from + (to - from) * ease(p);
+    if (p < 1) { animId = requestAnimationFrame(fly); return; }
+    track.classList.remove('no-snap');
+    suppress = false;
+    if (opts.done) opts.done();
+  };
+  animId = requestAnimationFrame(fly);
+}
+
+function snapToReal(i, opts) {
+  update(i);
+  animateTo(trackFromReal(i), opts);
+}
+
+// Kalau posisi istirahat di klon (sisa sentuhan/fling), lompat instan ke slide asli padanannya.
+function normalizePosition() {
+  const k = nearestTrack();
+  if (k !== 0 && k !== n + 1) return realFromTrack(k);
+  const r = realFromTrack(k);
+  track.classList.add('no-snap');
+  track.scrollLeft = Math.max(slideCenter(track.children[trackFromReal(r)]) - track.clientWidth / 2, 0);
+  track.classList.remove('no-snap');
+  return r;
+}
+
+function goReal(i) {
+  if (suppress) return;
+  normalizePosition();
+  snapToReal(((i % n) + n) % n);
+}
+
+// next/prev: melewati klon di ujung lalu melompat instan ke slide asli — tanpa putus, tanpa gulir balik.
+function step(dir) {
+  if (suppress) return;
+  normalizePosition();
+  const next = active + dir;
+  if (next < 0) {
+    update(n - 1);
+    animateTo(0, { done: () => animateTo(trackFromReal(n - 1), { instant: true }) });
+  } else if (next > n - 1) {
+    update(0);
+    animateTo(n + 1, { done: () => animateTo(trackFromReal(0), { instant: true }) });
+  } else {
+    goReal(next);
+  }
+}
+
 let rafPending = false;
 track.addEventListener('scroll', () => {
-  if (rafPending) return;
+  if (suppress || rafPending) return;
   rafPending = true;
   requestAnimationFrame(() => {
     rafPending = false;
-    const best = nearest();
-    if (best !== active) update(best);
+    if (suppress) return;
+    const real = realFromTrack(nearestTrack());
+    if (real !== active) update(real);
   });
 }, { passive: true });
 
-document.getElementById('gal-prev').addEventListener('click', () => go(Math.max(active - 1, 0)));
-document.getElementById('gal-next').addEventListener('click', () => go(Math.min(active + 1, SCREENSHOTS.length - 1)));
+// Sentuhan saat animasi berjalan membatalkannya supaya geser manual tidak berkelahi dengan rAF.
+track.addEventListener('touchstart', () => {
+  if (suppress) {
+    cancelAnimationFrame(animId);
+    suppress = false;
+    track.classList.remove('no-snap');
+  }
+}, { passive: true });
+
+document.getElementById('gal-prev').addEventListener('click', () => step(-1));
+document.getElementById('gal-next').addEventListener('click', () => step(1));
 
 gal.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowLeft') { e.preventDefault(); go(Math.max(active - 1, 0)); }
-  if (e.key === 'ArrowRight') { e.preventDefault(); go(Math.min(active + 1, SCREENSHOTS.length - 1)); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
 });
 
 // Drag mouse di desktop; sentuh sudah ditangani scroll-snap native.
-let dragging = false, dragStartX = 0, dragStartLeft = 0, dragTimer = null;
+let dragging = false, dragStartX = 0, dragStartLeft = 0;
 track.addEventListener('pointerdown', (e) => {
   if (e.pointerType !== 'mouse') return;
   dragging = true;
@@ -816,14 +904,29 @@ track.addEventListener('pointermove', (e) => {
 function endDrag() {
   if (!dragging) return;
   dragging = false;
-  go(nearest());
-  clearTimeout(dragTimer);
-  dragTimer = setTimeout(() => track.classList.remove('dragging'), 450);
+  const k = nearestTrack();
+  // Lepas 'dragging' sambil langsung pasang 'no-snap': snap mandatory tidak boleh mengoreksi
+  // posisi sebelum animasi selembarkan berjalan, kalau tidak lompatannya terlihat.
+  track.classList.remove('dragging');
+  track.classList.add('no-snap');
+  // Lepas di zona klon: selembarkan dulu klon ke tengah, baru lompat instan ke slide asli —
+  // lompatan langsung dari posisi sembarangan akan terlihat karena klon belum persis di tengah.
+  if (k === 0) {
+    update(n - 1);
+    animateTo(0, { done: () => animateTo(trackFromReal(n - 1), { instant: true }) });
+  } else if (k === n + 1) {
+    update(0);
+    animateTo(n + 1, { done: () => animateTo(trackFromReal(0), { instant: true }) });
+  } else {
+    goReal(realFromTrack(k));
+  }
 }
 track.addEventListener('pointerup', endDrag);
 track.addEventListener('pointercancel', endDrag);
 
+// Posisi awal: slide asli pertama di tengah (child 0 adalah klon slide terakhir).
 update(0);
+track.scrollLeft = Math.max(slideCenter(track.children[1]) - track.clientWidth / 2, 0);
 
 // Accordion FAQ
 document.querySelectorAll('.faq-q').forEach((btn) => {
