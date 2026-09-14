@@ -4,6 +4,9 @@
   Design read: landing produk untuk pemilik kendaraan pribadi Indonesia,
   bahasa visual "buku servis modern" (terang, rapi, motif plat & odometer).
   Dial: ENERGY 2 / RHYTHM 2 / MOTION 2 (reveal sekali jalan + transisi interaksi, tanpa loop).
+  Tipografi: Sora untuk teks isi (font yang sama dengan app, lib/core/theme/theme.dart),
+  Epilogue untuk judul (h1-h3, brand) karena bobot 800 dan bentuk hurufnya lebih tegas
+  saat dipakai besar.
 -->
 <html lang="id">
 <head>
@@ -20,7 +23,7 @@
 <link rel="icon" type="image/png" href="images/app_icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400..800&family=Sora:wght@400..800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
 <style>
   /* Palet diambil dari token app (lib/core/theme/tokens.dart): biru #005BBF, aksen #C55500. */
@@ -40,8 +43,8 @@
     --amber: #C55500;
     --amber-text: #8A3E00;
     --amber-tint: #FCEADD;
-    --font-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
-    --font-body: "Inter", system-ui, -apple-system, sans-serif;
+    --font-display: "Epilogue", system-ui, sans-serif;
+    --font-body: "Sora", system-ui, -apple-system, sans-serif;
     --slide-w: clamp(240px, 74vw, 300px);
   }
 
