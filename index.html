@@ -347,10 +347,15 @@
   .wiz-panel h3 { font-size: 1.45rem; margin-bottom: 10px; }
   .wiz-panel p { max-width: 46ch; }
   html.js .wiz-panels, html.js .wiz-shots { display: grid; }
+  html.js .wiz-shots { width: 100%; }
   html.js .wiz-panel { grid-area: 1 / 1; opacity: 0; visibility: hidden; }
   html.js .wiz-panel.is-on { opacity: 1; visibility: visible; }
   html.js .wiz-shot { grid-area: 1 / 1; opacity: 0; }
   html.js .wiz-shot.is-on { opacity: 1; }
+  /* Gambar yang sedang tidak tampil tidak boleh menerima sentuhan, kalau tidak slider langkah dua
+     diam-diam menyerap geseran saat langkah lain yang aktif. */
+  html.js .wiz-shot { pointer-events: none; }
+  html.js .wiz-shot.is-on { pointer-events: auto; }
   /* Pergantian langkah: panel baru naik-fade seperti caption galeri, panel lama memudar.
      Transisi interaksi, sesuai dial MOTION halaman. */
   @media (prefers-reduced-motion: no-preference) {
@@ -360,8 +365,49 @@
   }
   .wiz-nav { display: none; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
   html.js .wiz-nav { display: flex; }
-  .wiz-phone { display: flex; justify-content: center; }
-  @media (min-width: 880px) { .wiz-phone { justify-content: flex-end; } }
+  .wiz-phone { --wiz-slide-w: var(--slide-w); display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  @media (min-width: 880px) { .wiz-phone { --wiz-slide-w: 300px; } }
+  /* Langkah dua memuat dua contoh catatan (BBM dan servis). Tiap gambar dibungkus frame ponsel
+     sendiri dan frame itu ikut bergeser, sama seperti carousel Tampilan: tetangga mengintip di
+     tepi dan yang tidak aktif meredup, jadi jelas masih ada gambar lain di sebelahnya.
+     Titik penanda duduk di atas frame supaya terlihat sebelum digulir. */
+  html.js .wiz-shot { display: grid; justify-items: center; }
+  html.js .wiz-shot .phone { width: var(--wiz-slide-w); max-width: none; }
+  html.js .wiz-slider {
+    display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory;
+    width: 100%; padding-block: 10px 14px;
+    padding-inline: calc((100% - var(--wiz-slide-w)) / 2);
+    scrollbar-width: none; cursor: grab;
+  }
+  /* Di layar sempit track melebar sampai tepi container supaya slide sebelahnya benar-benar
+     mengintip — itulah petunjuk bahwa masih ada gambar lain untuk digeser. Padding ikut
+     menghitung tambahan 40px itu supaya slide tetap pas di tengah. */
+  @media (max-width: 879.98px) {
+    html.js .wiz-slider {
+      width: calc(100% + 40px); margin-inline: -20px;
+      padding-inline: calc((100% + 40px - var(--wiz-slide-w)) / 2);
+    }
+  }
+  html.js .wiz-slider::-webkit-scrollbar { display: none; }
+  html.js .wiz-slider.dragging { cursor: grabbing; scroll-snap-type: none; }
+  html.js .wiz-slider.dragging .wiz-slide { pointer-events: none; }
+  html.js .wiz-slide { flex: 0 0 auto; width: var(--wiz-slide-w); scroll-snap-align: center; }
+  .wiz-slide:not(.is-active) { opacity: 0.5; transform: scale(0.96); }
+  .wiz-slide.is-active .phone { box-shadow: 0 24px 48px -20px rgba(13, 43, 82, 0.35); }
+  @media (prefers-reduced-motion: no-preference) {
+    .wiz-slide { transition: opacity 0.25s ease, transform 0.25s ease; }
+  }
+  .wiz-dots { width: 100%; max-width: var(--wiz-slide-w); justify-content: center; gap: 2px; }
+  html.js .wiz-dots { display: flex; }
+  .wiz-dot {
+    width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
+    background: none; border: 0; padding: 0; cursor: pointer;
+  }
+  .wiz-dot::after {
+    content: ""; width: 9px; height: 9px; border-radius: 999px;
+    background: #6E8098; transition: width 0.2s ease, background 0.2s ease;
+  }
+  .wiz-dot[aria-current="true"]::after { width: 24px; background: var(--blue); }
 
   /* Overlay onboarding: replika langkah pertama onboarding aplikasi (lib/features/onboarding),
      teks, warna, dan perilakunya disamakan: logo mobil yang bisa diketuk (getar + gelombang
@@ -611,7 +657,7 @@
         <div class="hero-phone reveal">
           <div class="phone">
             <div class="phone-screen">
-              <img src="images/home.jpg" alt="Beranda aplikasi CarBuddy: kartu kendaraan Toyota Avanza dengan odometer 40.450 km, ringkasan pengeluaran bulan ini, dan kewajiban terdekat" width="720" height="1560" decoding="async">
+              <img src="images/home.jpg" alt="Beranda aplikasi CarBuddy: kartu kendaraan Toyota Avanza dengan odometer 40.450 km, ringkasan pengeluaran bulan ini, dan kewajiban terdekat" width="1080" height="2340" decoding="async">
               <span class="punch" aria-hidden="true"></span>
             </div>
           </div>
@@ -637,7 +683,7 @@
       <div class="why-phone reveal">
         <div class="phone phone-sm">
           <div class="phone-screen">
-            <img src="images/timeline.jpg" alt="Tab Timeline CarBuddy: daftar catatan BBM, odometer, dan pengeluaran yang terurut per kendaraan" width="720" height="1560" loading="lazy" decoding="async">
+            <img src="images/timeline.jpg" alt="Tab Timeline CarBuddy: daftar catatan BBM, odometer, dan pengeluaran yang terurut per kendaraan" width="1080" height="2340" loading="lazy" decoding="async">
             <span class="punch" aria-hidden="true"></span>
           </div>
         </div>
@@ -691,7 +737,7 @@
           <p>Jarak tempuh, konsumsi km/L, dan total biaya per periode, dibandingkan dengan periode sebelumnya. Kamu tahu kapan konsumsi memburuk, bukan cuma merasa irit.</p>
         </div>
         <div class="feat-shot">
-          <img src="images/insights.jpg" alt="Tab Insights CarBuddy: jarak tempuh, efisiensi BBM 48,3 km/L, total pengeluaran, dan grafik tren efisiensi" width="720" height="1560" loading="lazy" decoding="async">
+          <img src="images/insights.jpg" alt="Tab Insights CarBuddy: jarak tempuh, efisiensi BBM 48,3 km/L, total pengeluaran, dan grafik tren efisiensi" width="1080" height="2340" loading="lazy" decoding="async">
         </div>
       </div>
 
@@ -734,11 +780,11 @@
         <div>
           <span class="plate">Tampilan aplikasi</span>
           <h2 id="tampilan-h">Lihat langsung layarnya.</h2>
-          <p>Lima layar yang paling sering dipakai, dari beranda sampai menu modul.</p>
+          <p>Enam layar yang paling sering dipakai, dari beranda sampai menu modul.</p>
         </div>
         <div class="gal-counter" aria-hidden="true">
           <div class="odo"><span class="odo-cell" data-odo="0">0</span><span class="odo-cell" data-odo="1">1</span></div>
-          <span class="odo-rest">/ 05</span>
+          <span class="odo-rest">/ 06</span>
         </div>
       </div>
 
@@ -754,11 +800,12 @@
 
       <noscript>
         <div class="gal-static">
-          <figure><img src="images/home.jpg" alt="Beranda CarBuddy" width="720" height="1560"><figcaption>Beranda: status kendaraan, pengeluaran bulan ini, dan kewajiban terdekat.</figcaption></figure>
-          <figure><img src="images/timeline.jpg" alt="Timeline CarBuddy" width="720" height="1560" loading="lazy"><figcaption>Timeline: semua catatan terurut, bisa disaring per kategori.</figcaption></figure>
-          <figure><img src="images/insights.jpg" alt="Insights CarBuddy" width="720" height="1560" loading="lazy"><figcaption>Insight: jarak, konsumsi, dan pengeluaran per kendaraan.</figcaption></figure>
-          <figure><img src="images/reminders.jpg" alt="Reminders CarBuddy" width="720" height="1560" loading="lazy"><figcaption>Pengingat dengan hitungan hari sebelum jatuh tempo.</figcaption></figure>
-          <figure><img src="images/more.jpg" alt="Menu More CarBuddy" width="720" height="1560" loading="lazy"><figcaption>Semua modul: kendaraan, perawatan, BBM, pajak, asuransi, ban, aki.</figcaption></figure>
+          <figure><img src="images/home.jpg" alt="Beranda CarBuddy" width="1080" height="2340"><figcaption>Beranda: status kendaraan, pengeluaran bulan ini, dan kewajiban terdekat.</figcaption></figure>
+          <figure><img src="images/timeline.jpg" alt="Timeline CarBuddy" width="1080" height="2340" loading="lazy"><figcaption>Timeline: semua catatan terurut, bisa disaring per kategori.</figcaption></figure>
+          <figure><img src="images/insights.jpg" alt="Insights CarBuddy" width="1080" height="2340" loading="lazy"><figcaption>Insight: jarak, konsumsi, dan pengeluaran per kendaraan.</figcaption></figure>
+          <figure><img src="images/reminders.jpg" alt="Reminders CarBuddy" width="1080" height="2340" loading="lazy"><figcaption>Pengingat dengan hitungan hari sebelum jatuh tempo.</figcaption></figure>
+          <figure><img src="images/more.jpg" alt="Menu More CarBuddy" width="1080" height="2340" loading="lazy"><figcaption>Semua modul: kendaraan, perawatan, BBM, pajak, asuransi, ban, aki.</figcaption></figure>
+          <figure><img src="images/maintenance.jpg" alt="Perawatan CarBuddy" width="1080" height="2340" loading="lazy"><figcaption>Perawatan: biaya, riwayat servis, dan jadwal berikutnya.</figcaption></figure>
         </div>
       </noscript>
     </div>
@@ -797,14 +844,44 @@
         </div>
       </div>
       <div class="wiz-phone reveal">
-        <div class="phone phone-sm">
-          <div class="phone-screen">
-            <div class="wiz-shots">
-              <img class="wiz-shot is-on" src="images/tambah-kendaraan.jpg" alt="Formulir Tambah Kendaraan di aplikasi CarBuddy: merek Toyota, model Avanza, tahun 2020, dan plat nomor B 1234 XYZ" width="1080" height="2340" decoding="async">
-              <img class="wiz-shot" src="images/tambah-bensin.jpg" alt="Formulir Catat Pengisian BBM di aplikasi CarBuddy: Toyota Avanza, 12 September 2026, Pertalite 10 liter dengan total Rp 100.000" width="1080" height="2340" loading="lazy" decoding="async">
-              <img class="wiz-shot" src="images/reminders.jpg" alt="Tab Reminders dengan hitungan hari menuju jatuh tempo pajak dan pengingat lainnya" width="720" height="1560" loading="lazy" decoding="async">
+        <div class="wiz-dots" id="wiz-dots" hidden>
+          <button class="wiz-dot" type="button" aria-label="Contoh catatan BBM" aria-current="true"></button>
+          <button class="wiz-dot" type="button" aria-label="Contoh catatan perawatan" aria-current="false"></button>
+        </div>
+        <div class="wiz-shots">
+          <div class="wiz-shot is-on">
+            <div class="phone phone-sm">
+              <div class="phone-screen">
+                <img src="images/tambah-kendaraan.jpg" alt="Formulir Tambah Kendaraan di aplikasi CarBuddy: merek Toyota, model Avanza, tahun 2020, dan plat nomor B 1234 XYZ" width="1080" height="2340" decoding="async">
+                <span class="punch" aria-hidden="true"></span>
+              </div>
             </div>
-            <span class="punch" aria-hidden="true"></span>
+          </div>
+          <div class="wiz-shot wiz-slider" id="wiz-slider" role="group" aria-label="Contoh catatan langkah dua, geser untuk berpindah" tabindex="0">
+            <div class="wiz-slide is-active">
+              <div class="phone phone-sm">
+                <div class="phone-screen">
+                  <img src="images/tambah-bensin.jpg" alt="Formulir Catat Pengisian BBM di aplikasi CarBuddy: Toyota Avanza, 12 September 2026, Pertalite 10 liter dengan total Rp 100.000" width="1080" height="2340" loading="lazy" decoding="async">
+                  <span class="punch" aria-hidden="true"></span>
+                </div>
+              </div>
+            </div>
+            <div class="wiz-slide">
+              <div class="phone phone-sm">
+                <div class="phone-screen">
+                  <img src="images/tambah-perawatan.jpg" alt="Formulir Catat Perawatan di aplikasi CarBuddy: Toyota Avanza, 14 September 2026, odometer 40.450 km, dan kolom deskripsi pekerjaan" width="1080" height="2340" loading="lazy" decoding="async">
+                  <span class="punch" aria-hidden="true"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="wiz-shot">
+            <div class="phone phone-sm">
+              <div class="phone-screen">
+                <img src="images/reminders.jpg" alt="Tab Reminders dengan hitungan hari menuju jatuh tempo pajak dan pengingat lainnya" width="1080" height="2340" loading="lazy" decoding="async">
+                <span class="punch" aria-hidden="true"></span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -910,7 +987,7 @@
       <img src="images/app_icon.png" alt="" width="24" height="24">
       <b>CarBuddy</b>
     </a>
-    <p>© 2026 CarBuddy. Dibuat di Indonesia.</p>
+    <p>© 2026 CarBuddy. All rights reserved.</p>
     <div class="foot-links">
       <a href="mailto:dev@azmirf.my.id">dev@azmirf.my.id</a>
     </div>
@@ -967,6 +1044,11 @@ const SCREENSHOTS = [
     src: 'images/more.jpg',
     alt: 'Menu More berisi grid modul Vehicles, Maintenance, Fuel Logs, Expense List, Vehicle Tax, Insurance, Tires, dan Battery',
     caption: 'Semua modul: kendaraan, perawatan, BBM, pengeluaran, pajak, asuransi, ban, sampai aki.'
+  },
+  {
+    src: 'images/maintenance.jpg',
+    alt: 'Tab Perawatan dengan ringkasan biaya Rp3.820.000, 10 perawatan, 4 jadwal, dan daftar servis berikutnya per kendaraan',
+    caption: 'Perawatan: biaya, riwayat servis, dan jadwal berikutnya per kendaraan.'
   }
 ];
 
@@ -994,7 +1076,7 @@ function makeSlide(cfg, k) {
   fig.dataset.real = String(realFromTrack(k));
   fig.innerHTML =
     '<div class="phone"><div class="phone-screen">' +
-    '<img src="' + cfg.src + '" alt="' + cfg.alt + '" width="720" height="1560"' +
+    '<img src="' + cfg.src + '" alt="' + cfg.alt + '" width="1080" height="2340"' +
     (k === 1 ? '' : ' loading="lazy"') + ' decoding="async">' +
     '<span class="punch" aria-hidden="true"></span></div></div>';
   fig.addEventListener('click', () => goReal(realFromTrack(k)));
@@ -1243,6 +1325,10 @@ const wizNext = document.getElementById('wiz-next');
 const wizCta = document.getElementById('wiz-cta');
 const wizPanels = [...document.querySelectorAll('.wiz-panel')];
 const wizShots = [...document.querySelectorAll('.wiz-shot')];
+const wizSlider = document.getElementById('wiz-slider');
+const wizSlides = [...document.querySelectorAll('.wiz-slide')];
+const wizDots = document.getElementById('wiz-dots');
+const wizDotBtns = [...document.querySelectorAll('.wiz-dot')];
 let wizI = 0;
 function wizUpdate() {
   wizPanels.forEach((p, k) => p.classList.toggle('is-on', k === wizI));
@@ -1250,6 +1336,10 @@ function wizUpdate() {
     s.classList.toggle('is-on', k === wizI);
     s.setAttribute('aria-hidden', k === wizI ? 'false' : 'true');
   });
+  // Titik penanda hanya relevan selama langkah dua tampil, dan slidernya cuma boleh di-tab
+  // saat benar-benar tampil.
+  wizDots.hidden = wizI !== 1;
+  wizSlider.tabIndex = wizI === 1 ? 0 : -1;
   rollOdo(wizStrips, String(wizI + 1).padStart(2, '0'));
   wizPrev.hidden = wizI === 0;
   const last = wizI === wizPanels.length - 1;
@@ -1262,11 +1352,73 @@ function wizGo(next) {
 }
 wizPrev.addEventListener('click', () => wizGo(wizI - 1));
 wizNext.addEventListener('click', () => wizGo(wizI + 1));
+
+// Slider langkah dua: dua contoh catatan digeser mendatar, titik penanda mengikuti posisi.
+// Indeks dihitung dari geometri slide, bukan scrollLeft/clientWidth, karena track memakai padding
+// pengintip: tetangga di tepi harus terlihat supaya jelas masih ada gambar lain.
+function wizSlideCenter(el) {
+  const tr = wizSlider.getBoundingClientRect();
+  const er = el.getBoundingClientRect();
+  return er.left + er.width / 2 - tr.left + wizSlider.scrollLeft;
+}
+function wizSlideIndex() {
+  const center = wizSlider.scrollLeft + wizSlider.clientWidth / 2;
+  let best = 0, bd = Infinity;
+  wizSlides.forEach((el, k) => {
+    const d = Math.abs(wizSlideCenter(el) - center);
+    if (d < bd) { bd = d; best = k; }
+  });
+  return best;
+}
+function wizSlideTo(k) {
+  const to = Math.max(0, Math.min(wizSlides.length - 1, k));
+  const el = wizSlides[to];
+  wizSlider.scrollTo({
+    left: Math.max(wizSlideCenter(el) - wizSlider.clientWidth / 2, 0),
+    behavior: reduceMotion ? 'auto' : 'smooth',
+  });
+}
+function wizSlideUpdate() {
+  const k = wizSlideIndex();
+  wizSlides.forEach((s, i) => s.classList.toggle('is-active', i === k));
+  wizDotBtns.forEach((d, i) => d.setAttribute('aria-current', String(i === k)));
+}
+wizSlider.addEventListener('scroll', wizSlideUpdate, { passive: true });
+wizDotBtns.forEach((d, k) => d.addEventListener('click', () => wizSlideTo(k)));
+
+// Drag mouse di desktop; di layar sentuh scroll-snap native sudah cukup.
+let wizDragging = false, wizDragX = 0, wizDragLeft = 0;
+wizSlider.addEventListener('pointerdown', (e) => {
+  if (e.pointerType !== 'mouse') return;
+  wizDragging = true;
+  wizDragX = e.clientX;
+  wizDragLeft = wizSlider.scrollLeft;
+  wizSlider.classList.add('dragging');
+  wizSlider.setPointerCapture(e.pointerId);
+});
+wizSlider.addEventListener('pointermove', (e) => {
+  if (!wizDragging) return;
+  wizSlider.scrollLeft = wizDragLeft - (e.clientX - wizDragX);
+});
+function wizEndDrag() {
+  if (!wizDragging) return;
+  wizDragging = false;
+  wizSlider.classList.remove('dragging');
+  wizSlideTo(wizSlideIndex());
+}
+wizSlider.addEventListener('pointerup', wizEndDrag);
+wizSlider.addEventListener('pointercancel', wizEndDrag);
+wizSlider.addEventListener('keydown', (e) => {
+  // Panah ditahan di slider selama fokus ada di sini, kalau tidak #wiz ikut melompatkan langkah.
+  if (e.key === 'ArrowLeft') { e.preventDefault(); e.stopPropagation(); wizSlideTo(wizSlideIndex() - 1); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); e.stopPropagation(); wizSlideTo(wizSlideIndex() + 1); }
+});
 wizRoot.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') { e.preventDefault(); wizGo(wizI - 1); }
   if (e.key === 'ArrowRight') { e.preventDefault(); wizGo(wizI + 1); }
 });
 wizUpdate();
+wizSlideUpdate();
 
 // Accordion FAQ
 document.querySelectorAll('.faq-q').forEach((btn) => {
