@@ -37,6 +37,8 @@
     --blue-deep: #0A4E9E;
     --blue-hover: #004C9E;
     --blue-tint: #E4EEFB;
+    /* Garis SoftCard di app (AppTokens.cardOutline), lebih lembut dari --line. */
+    --card-line: #DCE9F7;
     --navy: #0D2B52;
     --navy-ink: #C9D9EE;
     --navy-icon: #9CC0EA;
@@ -257,6 +259,24 @@
     background: var(--amber-tint); color: var(--amber-text);
     font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 5px;
   }
+
+  /* Mock SoftCard: treatment kartu aplikasi apa adanya (putih, garis biru muda,
+     tanpa bayangan) supaya baris yang dijelaskan di sini terbaca sama dengan
+     yang nanti ditemui di halaman detail servis. */
+  .soft-stack { display: grid; gap: 12px; }
+  .soft-card {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--surface); border: 1px solid var(--card-line); border-radius: 16px;
+    padding: 16px;
+  }
+  .soft-card > .ms { color: var(--blue); font-size: 22px; flex: 0 0 auto; }
+  .soft-card-body { min-width: 0; flex: 1; }
+  .soft-card-title { font-weight: 700; color: var(--ink); font-size: 0.95rem; }
+  .soft-card-sub { font-size: 0.86rem; margin-top: 2px; }
+  /* Deskripsi record induk dipotong satu baris, persis seperti di app: dua servis
+     dibedakan sekilas, dan barisnya tidak ikut menaikkan tinggi kartu. */
+  .soft-card-sub.clip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .soft-card-go { color: var(--ink-2); font-size: 20px; flex: 0 0 auto; }
 
   .feat-rest { display: grid; gap: 20px; margin-top: 20px; }
   @media (min-width: 640px) { .feat-rest { grid-template-columns: 1fr 1fr; } }
@@ -734,6 +754,34 @@
 
       <div class="feat-wide reveal" style="margin-top: 20px;">
         <div>
+          <div class="feat-icon"><span class="ms" aria-hidden="true">link</span></div>
+          <h3>Servis lanjutan</h3>
+          <p>Saat jadwal servis jatuh tempo, catat pengerjaannya sebagai <strong>servis lanjutan</strong> dari jadwal itu. Jadwal lamanya ikut tertutup, dan catatan barunya membawa jadwal berikutnya, saling menunjuk satu sama lain.</p>
+        </div>
+        <div class="soft-stack">
+          <p class="notif-label">Di halaman detail servis</p>
+          <div class="soft-card">
+            <span class="ms" aria-hidden="true">build_circle</span>
+            <div class="soft-card-body">
+              <p class="soft-card-title">Catat servis lanjutan</p>
+              <p class="soft-card-sub">Buat catatan servis baru yang melanjutkan jadwal ini</p>
+            </div>
+            <span class="ms soft-card-go" aria-hidden="true">chevron_right</span>
+          </div>
+          <div class="soft-card">
+            <span class="ms" aria-hidden="true">history</span>
+            <div class="soft-card-body">
+              <p class="soft-card-title">Servis sebelumnya</p>
+              <p class="soft-card-sub">Oli &middot; 18 November 2026</p>
+              <p class="soft-card-sub clip">Ganti oli + filter</p>
+            </div>
+            <span class="ms soft-card-go" aria-hidden="true">chevron_right</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="feat-wide reveal" style="margin-top: 20px;">
+        <div>
           <div class="feat-icon"><span class="ms" aria-hidden="true">monitoring</span></div>
           <h3>Insight yang jujur</h3>
           <p>Jarak tempuh, konsumsi km/L, dan total biaya per periode, dibandingkan dengan periode sebelumnya. Kamu tahu kapan konsumsi memburuk, bukan cuma merasa irit.</p>
@@ -830,8 +878,8 @@
               <p>Isi nama, plat, dan odometer awal. Tidak ada akun yang diminta, catatannya langsung tersimpan di HP.</p>
             </div>
             <div class="wiz-panel">
-              <h3>Catat isi bensin dan servis</h3>
-              <p>Setiap catatan masuk ke timeline kendaraan, lengkap dengan biayanya. Konsumsi dihitung dari data asli, bukan perkiraan.</p>
+              <h3>Catat detail servis</h3>
+              <p>Formulirnya dibawakan tiga langkah: pilih jenis catatannya, isi detail servis dan jadwal berikutnya, lalu rinci biayanya per komponen. Hasilnya masuk ke timeline kendaraan lengkap dengan totalnya.</p>
             </div>
             <div class="wiz-panel">
               <h3>Biarkan pengingat bekerja</h3>
@@ -847,8 +895,9 @@
       </div>
       <div class="wiz-phone reveal">
         <div class="wiz-dots" id="wiz-dots" hidden>
-          <button class="wiz-dot" type="button" aria-label="Contoh catatan BBM" aria-current="true"></button>
-          <button class="wiz-dot" type="button" aria-label="Contoh catatan perawatan" aria-current="false"></button>
+          <button class="wiz-dot" type="button" aria-label="Langkah satu: jenis catatan" aria-current="true"></button>
+          <button class="wiz-dot" type="button" aria-label="Langkah dua: detail servis" aria-current="false"></button>
+          <button class="wiz-dot" type="button" aria-label="Langkah tiga: rincian biaya" aria-current="false"></button>
         </div>
         <div class="wiz-shots">
           <div class="wiz-shot is-on">
@@ -859,11 +908,11 @@
               </div>
             </div>
           </div>
-          <div class="wiz-shot wiz-slider" id="wiz-slider" role="group" aria-label="Contoh catatan langkah dua, geser untuk berpindah" tabindex="0">
+          <div class="wiz-shot wiz-slider" id="wiz-slider" role="group" aria-label="Tiga langkah formulir Catat Perawatan, geser untuk berpindah" tabindex="0">
             <div class="wiz-slide is-active">
               <div class="phone phone-sm">
                 <div class="phone-screen">
-                  <img src="images/tambah-bensin.jpg" alt="Formulir Catat Pengisian BBM di aplikasi CarBuddy: Toyota Avanza, 12 September 2026, Pertalite 10 liter dengan total Rp 100.000" width="1080" height="2340" loading="lazy" decoding="async">
+                  <img src="images/catat-perawatan-1.jpg" alt="Formulir Catat Perawatan langkah 1 dari 3, Jenis: kendaraan Daihatsu Sirion T 1180 GS, pilihan Servis baru atau Servis lanjutan, dan kategori Transmission" width="1080" height="2340" loading="lazy" decoding="async">
                   <span class="punch" aria-hidden="true"></span>
                 </div>
               </div>
@@ -871,7 +920,15 @@
             <div class="wiz-slide">
               <div class="phone phone-sm">
                 <div class="phone-screen">
-                  <img src="images/tambah-perawatan.jpg" alt="Formulir Catat Perawatan di aplikasi CarBuddy: Toyota Avanza, 14 September 2026, odometer 40.450 km, dan kolom deskripsi pekerjaan" width="1080" height="2340" loading="lazy" decoding="async">
+                  <img src="images/catat-perawatan-2.jpg" alt="Formulir Catat Perawatan langkah 2 dari 3, Detail servis: 16 September 2026, odometer 48.384 km, deskripsi Penggantian oli transmisi, bengkel Daihatsu Purwakarta, dan jadwal berikutnya yang terisi otomatis dari kategori" width="1080" height="2340" loading="lazy" decoding="async">
+                  <span class="punch" aria-hidden="true"></span>
+                </div>
+              </div>
+            </div>
+            <div class="wiz-slide">
+              <div class="phone phone-sm">
+                <div class="phone-screen">
+                  <img src="images/catat-perawatan-3.jpg" alt="Formulir Catat Perawatan langkah 3 dari 3, Biaya: rincian Oli transmisi Rp 600.000 dan Jasa service Rp 50.000, lampiran struk, dengan total Rp 650.000 di footer" width="1080" height="2340" loading="lazy" decoding="async">
                   <span class="punch" aria-hidden="true"></span>
                 </div>
               </div>
@@ -1355,7 +1412,7 @@ function wizGo(next) {
 wizPrev.addEventListener('click', () => wizGo(wizI - 1));
 wizNext.addEventListener('click', () => wizGo(wizI + 1));
 
-// Slider langkah dua: dua contoh catatan digeser mendatar, titik penanda mengikuti posisi.
+// Slider langkah dua: tiga langkah formulir digeser mendatar, titik penanda mengikuti posisi.
 // Indeks dihitung dari geometri slide, bukan scrollLeft/clientWidth, karena track memakai padding
 // pengintip: tetangga di tepi harus terlihat supaya jelas masih ada gambar lain.
 function wizSlideCenter(el) {
