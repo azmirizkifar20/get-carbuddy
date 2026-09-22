@@ -13,9 +13,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CarBuddy, Semua Catatan Mobil di Satu Aplikasi</title>
-<meta name="description" content="CarBuddy: aplikasi Android untuk mencatat odometer, BBM, servis, pajak, dan asuransi kendaraan. Local-first, tanpa akun, offline penuh.">
+<meta name="description" content="CarBuddy: aplikasi Android untuk mencatat odometer, BBM, servis, pajak, dan asuransi kendaraan. Local-first, tanpa akun, catat tanpa internet. Dua bulan pertama gratis.">
 <meta property="og:title" content="CarBuddy, Semua Catatan Mobil di Satu Aplikasi">
-<meta property="og:description" content="Odometer, BBM, servis, pajak, sampai asuransi tercatat rapi di HP sendiri. Gratis, tanpa akun, offline penuh.">
+<meta property="og:description" content="Odometer, BBM, servis, pajak, sampai asuransi tercatat rapi di HP sendiri. Tanpa akun, catat tanpa internet, dua bulan pertama gratis.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://azmirizkifar20.github.io/get-carbuddy/">
 <meta property="og:image" content="https://azmirizkifar20.github.io/get-carbuddy/images/meta.png">
@@ -25,612 +25,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400..800&family=Sora:wght@400..800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
-<style>
-  /* Palet diambil dari token app (lib/core/theme/tokens.dart): biru #005BBF, aksen #C55500. */
-  :root {
-    --bg: #F6F8FB;
-    --surface: #FFFFFF;
-    --ink: #17202B;
-    --ink-2: #55606E;
-    --line: #DCE4F0;
-    --blue: #005BBF;
-    --blue-deep: #0A4E9E;
-    --blue-hover: #004C9E;
-    --blue-tint: #E4EEFB;
-    /* Garis SoftCard di app (AppTokens.cardOutline), lebih lembut dari --line. */
-    --card-line: #DCE9F7;
-    --navy: #0D2B52;
-    --navy-ink: #C9D9EE;
-    --navy-icon: #9CC0EA;
-    --amber: #C55500;
-    --amber-text: #8A3E00;
-    --amber-tint: #FCEADD;
-    --font-display: "Epilogue", system-ui, sans-serif;
-    --font-body: "Sora", system-ui, -apple-system, sans-serif;
-    --slide-w: clamp(240px, 74vw, 300px);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-padding-top: 88px; }
-  @media (prefers-reduced-motion: no-preference) {
-    html { scroll-behavior: smooth; }
-  }
-  body {
-    font-family: var(--font-body);
-    background: var(--bg);
-    color: var(--ink);
-    line-height: 1.6;
-    font-size: 1rem;
-    -webkit-font-smoothing: antialiased;
-  }
-  img { max-width: 100%; display: block; }
-  h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; letter-spacing: -0.01em; }
-  h2 { font-size: clamp(1.5rem, 2.4vw + 0.85rem, 2.3rem); font-weight: 700; }
-  h3 { font-size: 1.25rem; font-weight: 700; }
-  /* Ponsel: langkah tipe lebih kecil (root 15px). Target sentuh berbasis px tidak ikut menyusut. */
-  @media (max-width: 719px) {
-    html { font-size: 93.75%; }
-  }
-  p { color: var(--ink-2); }
-  strong { color: var(--ink); font-weight: 600; }
-  [hidden] { display: none !important; }
-
-  .container { width: min(1120px, 100% - 40px); margin-inline: auto; }
-  @media (min-width: 720px) { .container { width: min(1120px, 100% - 56px); } }
-
-  .ms {
-    font-family: "Material Symbols Outlined";
-    font-weight: normal; font-style: normal;
-    display: inline-block; line-height: 1;
-    font-variation-settings: "FILL" 0, "wght" 400, "opsz" 24;
-    user-select: none;
-  }
-
-  .skip {
-    position: absolute; left: -9999px; top: 12px; z-index: 100;
-    background: var(--blue); color: #fff; padding: 10px 16px; border-radius: 8px;
-  }
-  .skip:focus { left: 12px; }
-
-  :focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
-  .on-dark :focus-visible { outline-color: #fff; }
-
-  /* Elemen identitas: chip bergaya plat kendaraan Indonesia (putih, teks hitam, strip biru). */
-  .plate {
-    display: inline-flex; align-items: stretch; gap: 8px;
-    background: var(--surface); border: 1.5px solid var(--ink); border-radius: 5px;
-    padding: 4px 12px 4px 4px;
-    font-size: 0.78rem; font-weight: 700; letter-spacing: 0.02em; color: var(--ink);
-  }
-  .plate::before { content: ""; width: 7px; border-radius: 2px; background: var(--blue); }
-  .on-dark .plate { background: transparent; border-color: #fff; color: #fff; }
-
-  /* Angka bergaya odometer: sel terpisah dengan garis tengah, angka tabular. JS mengisi tiap
-     sel dengan strip vertikal 0-9 di balik jendela setinggi satu angka, jadi update menggulir
-     seperti odometer sungguhan. Motif identitas produk yang sengaja diulang: penghitung galeri
-     dan penghitung langkah wizard cara-mulai. */
-  .odo { display: inline-flex; background: #14202F; border-radius: 6px; padding: 4px 2px; }
-  .odo-cell {
-    color: #fff; font-weight: 700; font-size: 0.9rem; line-height: 1;
-    padding: 4px 5px; font-variant-numeric: tabular-nums;
-  }
-  .odo-cell + .odo-cell { border-left: 1px solid rgba(255,255,255,0.28); }
-  .odo-win { display: block; height: 1em; overflow: hidden; }
-  .odo-strip { display: block; }
-  .odo-strip > span { display: block; height: 1em; line-height: 1; }
-  @media (prefers-reduced-motion: no-preference) {
-    .odo-strip { transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
-  }
-  .odo-rest { color: var(--ink-2); font-weight: 600; font-size: 0.9rem; align-self: center; margin-left: 8px; }
-
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    min-height: 48px; padding: 12px 22px; border-radius: 12px;
-    font: 600 1rem var(--font-body); text-decoration: none; cursor: pointer;
-    border: 1.5px solid transparent;
-  }
-  .btn-primary { background: var(--blue); color: #fff; }
-  .btn-primary:hover { background: var(--blue-hover); }
-  .btn-ghost { background: var(--surface); color: var(--blue-deep); border-color: var(--blue); }
-  .btn-ghost:hover { background: var(--blue-tint); }
-  /* Umpan balik tekan: tombol tenggelam 1px saat aktif, konfirmasi sentuhan yang murah tapi terasa. */
-  @media (prefers-reduced-motion: no-preference) {
-    .btn { transition: transform 0.15s ease; }
-    .btn:active { transform: translateY(1px); }
-  }
-  .btn-lg { min-height: 56px; padding: 16px 30px; font-size: 1.05rem; border-radius: 14px; }
-
-  /* Marka jalan: garis putus pemisah section, satu-satunya ornamen garis. */
-  .road { border: 0; border-top: 3px dashed #C7D6EA; }
-
-  /* Frame HP gaya Android. Bayangan hanya untuk foto utama (hero) dan slide aktif galeri. */
-  .phone {
-    background: #101821; border-radius: 46px; padding: 11px;
-    width: 100%; max-width: 340px;
-  }
-  .phone-sm { max-width: 300px; }
-  .phone-screen { border-radius: 36px; overflow: hidden; position: relative; background: #fff; }
-  .phone-screen img { width: 100%; height: auto; user-select: none; -webkit-user-drag: none; }
-  .punch {
-    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
-    width: 12px; height: 12px; border-radius: 50%; background: #101821;
-  }
-
-  /* Header */
-  .site-head {
-    position: sticky; top: 0; z-index: 50;
-    background: var(--surface); border-bottom: 1px solid var(--line);
-  }
-  .head-in { display: flex; align-items: center; gap: 20px; height: 66px; }
-  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
-  .brand img { width: 28px; height: 28px; border-radius: 7px; }
-  .brand b { font: 700 1.2rem var(--font-display); letter-spacing: -0.01em; }
-  .nav-links { display: none; align-items: center; gap: 4px; margin-left: auto; }
-  .nav-links a {
-    display: inline-flex; align-items: center; min-height: 44px; padding: 8px 14px;
-    color: var(--ink-2); text-decoration: none; font-weight: 500; font-size: 0.95rem;
-    border-radius: 8px;
-  }
-  .nav-links a:hover { color: var(--ink); background: var(--bg); }
-  .nav-links a.active { color: var(--blue); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
-  /* CTA navbar lebih ramping dari .btn dasar; 44px menjaga target sentuh minimum. */
-  .head-cta { display: none; margin-left: 12px; min-height: 44px; padding: 8px 16px; font-size: 0.9rem; border-radius: 10px; }
-  .burger {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 44px; height: 44px; margin-left: auto;
-    background: none; border: 1.5px solid var(--line); border-radius: 10px;
-    color: var(--ink); cursor: pointer;
-  }
-  @media (min-width: 880px) {
-    .nav-links { display: flex; }
-    .head-cta { display: inline-flex; }
-    .burger { display: none; }
-  }
-  .mobile-menu { display: none; border-top: 1px solid var(--line); background: var(--surface); padding: 10px 0 14px; }
-  .menu-open .mobile-menu { display: block; }
-  .mobile-menu a {
-    display: flex; align-items: center; min-height: 48px; padding: 10px 4px;
-    color: var(--ink); text-decoration: none; font-weight: 500;
-    border-bottom: 1px solid var(--bg);
-  }
-  .mobile-menu a:last-child { border-bottom: 0; }
-
-  /* Hero */
-  .hero { padding-block: clamp(48px, 8vw, 96px) clamp(40px, 6vw, 72px); }
-  .hero-grid { display: grid; gap: 44px; align-items: center; }
-  @media (min-width: 880px) { .hero-grid { grid-template-columns: 1.05fr 0.95fr; gap: 56px; } }
-  .hero h1 {
-    font-size: clamp(1.9rem, 4.2vw + 0.9rem, 3.4rem);
-    font-weight: 800; margin: 14px 0 18px;
-  }
-  .hero h1 span { color: var(--blue); }
-  .hero-sub { font-size: 1.08rem; max-width: 46ch; }
-  .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-  .hero-facts {
-    display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 22px;
-    color: var(--ink-2); font-size: 0.92rem; font-weight: 500;
-  }
-  .hero-phone { display: flex; justify-content: center; }
-  @media (min-width: 880px) { .hero-phone { justify-content: flex-end; } }
-  .hero .road { margin-top: clamp(40px, 6vw, 72px); }
-
-  /* Section dasar */
-  section { padding-block: clamp(56px, 8vw, 96px); }
-  .sec-head { max-width: 640px; margin-bottom: clamp(28px, 4vw, 44px); }
-  .sec-head h2 { margin: 14px 0 12px; }
-  .sec-head p { font-size: 1.02rem; }
-
-  /* Kenapa */
-  .why-grid { display: grid; gap: 40px; align-items: center; }
-  @media (min-width: 880px) { .why-grid { grid-template-columns: 1.05fr 0.95fr; gap: 56px; } }
-  .pain-list { list-style: none; margin: 18px 0; display: grid; gap: 10px; }
-  .pain-list li { display: flex; gap: 10px; align-items: baseline; color: var(--ink-2); }
-  .pain-list .ms { color: var(--amber); font-size: 20px; transform: translateY(3px); }
-  .why-sol { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 1.02rem; }
-  .why-phone { display: flex; justify-content: center; }
-
-  /* Fitur */
-  .fitur { background: var(--surface); border-block: 1px solid var(--line); }
-  .feat-big {
-    display: grid; gap: 32px; align-items: center;
-    padding: clamp(24px, 3.5vw, 40px);
-    background: var(--bg); border: 1px solid var(--line); border-radius: 20px;
-  }
-  @media (min-width: 880px) { .feat-big { grid-template-columns: 1fr 1fr; gap: 48px; } }
-  .feat-big h3 { font-size: 1.45rem; margin-bottom: 12px; }
-  .feat-big .lead { margin-bottom: 16px; }
-  .tick-list { list-style: none; display: grid; gap: 8px; }
-  .tick-list li { display: flex; gap: 10px; align-items: baseline; color: var(--ink-2); }
-  .tick-list .ms { color: var(--blue); font-size: 20px; transform: translateY(3px); }
-
-  /* Mock notifikasi Android: menampilkan perilaku yang tak tampak di screenshot statis. */
-  .notif-stack { display: grid; gap: 12px; }
-  .notif-label { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.02em; color: var(--ink-2); }
-  .notif {
-    background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
-    padding: 14px 16px; box-shadow: 0 8px 20px -14px rgba(13, 43, 82, 0.35);
-  }
-  .notif-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .notif-head img { width: 18px; height: 18px; border-radius: 4px; }
-  .notif-app { font-size: 0.78rem; font-weight: 600; color: var(--ink); }
-  .notif-title { font-weight: 600; color: var(--ink); font-size: 0.95rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .notif-body { font-size: 0.88rem; margin-top: 2px; }
-  .chip-segera {
-    background: var(--amber-tint); color: var(--amber-text);
-    font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 5px;
-  }
-
-  /* Mock SoftCard: treatment kartu aplikasi apa adanya (putih, garis biru muda,
-     tanpa bayangan) supaya baris yang dijelaskan di sini terbaca sama dengan
-     yang nanti ditemui di halaman detail servis. */
-  .soft-stack { display: grid; gap: 12px; }
-  .soft-card {
-    display: flex; align-items: center; gap: 14px;
-    background: var(--surface); border: 1px solid var(--card-line); border-radius: 16px;
-    padding: 16px;
-  }
-  .soft-card > .ms { color: var(--blue); font-size: 22px; flex: 0 0 auto; }
-  .soft-card-body { min-width: 0; flex: 1; }
-  .soft-card-title { font-weight: 700; color: var(--ink); font-size: 0.95rem; }
-  .soft-card-sub { font-size: 0.86rem; margin-top: 2px; }
-  /* Deskripsi record induk dipotong satu baris, persis seperti di app: dua servis
-     dibedakan sekilas, dan barisnya tidak ikut menaikkan tinggi kartu. */
-  .soft-card-sub.clip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .soft-card-go { color: var(--ink-2); font-size: 20px; flex: 0 0 auto; }
-
-  .feat-rest { display: grid; gap: 20px; margin-top: 20px; }
-  @media (min-width: 640px) { .feat-rest { grid-template-columns: 1fr 1fr; } }
-  .feat-row {
-    display: flex; gap: 16px; padding: 22px;
-    background: var(--bg); border: 1px solid var(--line); border-radius: 16px;
-  }
-  .feat-icon {
-    flex: 0 0 44px; width: 44px; height: 44px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--blue-tint); color: var(--blue-deep);
-  }
-  .feat-row h3 { font-size: 1.02rem; margin-bottom: 4px; }
-  .feat-row p { font-size: 0.92rem; }
-  .feat-wide { padding: 22px; background: var(--bg); border: 1px solid var(--line); border-radius: 16px; }
-  @media (min-width: 880px) {
-    .feat-wide { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 28px; align-items: center; padding: 28px; }
-  }
-  .feat-wide .feat-icon { margin-bottom: 14px; }
-  .feat-wide h3 { font-size: 1.2rem; margin-bottom: 6px; }
-  .feat-wide p { max-width: 52ch; }
-  .feat-shot { border: 1px solid var(--line); border-radius: 18px; overflow: hidden; max-width: 280px; margin: 18px auto 0; }
-  @media (min-width: 880px) { .feat-shot { margin: 0; justify-self: end; } }
-  .feat-shot img { width: 100%; height: auto; }
-
-  /* Galeri tampilan */
-  .gal-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; max-width: none; }
-  .gal-head > div { max-width: 560px; }
-  .gal-counter { display: inline-flex; align-items: center; }
-  .gal {
-    outline-offset: 4px;
-  }
-  .gal-track { display: flex; gap: 20px;
-    overflow-x: auto; scroll-snap-type: x mandatory;
-    padding: 12px calc(50% - var(--slide-w) / 2) 28px;
-    scrollbar-width: none; cursor: grab;
-  }
-  .gal-track::-webkit-scrollbar { display: none; }
-  .gal-track.dragging { cursor: grabbing; }
-  .gal-track.dragging .gal-slide { pointer-events: none; }
-  /* Snap dimatikan selama drag dan animasi programatik supaya tidak berkelahi dengan scrollLeft. */
-  .gal-track.dragging, .gal-track.no-snap { scroll-snap-type: none; }
-  .gal-slide {
-    flex: 0 0 auto; width: var(--slide-w); scroll-snap-align: center;
-    transition: opacity 0.25s ease, transform 0.25s ease;
-  }
-  .gal-slide .phone { max-width: none; }
-  .gal-slide:not(.is-active) { opacity: 0.5; transform: scale(0.96); }
-  .gal-slide.is-active .phone { box-shadow: 0 24px 48px -20px rgba(13, 43, 82, 0.35); }
-  @media (prefers-reduced-motion: no-preference) {
-    .gal-slide { transition: opacity 0.25s ease, transform 0.25s ease; }
-  }
-  .gal-caption {
-    min-height: 3em; text-align: center; max-width: 52ch; margin-inline: auto;
-    font-size: 0.98rem;
-  }
-  /* Caption berganti dengan crossfade kecil tiap pindah slide, bukan bertukar mentah. */
-  @media (prefers-reduced-motion: no-preference) {
-    .gal-caption.swap { animation: cap-in 0.35s ease; }
-    @keyframes cap-in { from { opacity: 0; transform: translateY(4px); } }
-  }
-  .gal-nav { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 8px; }
-  .gal-arrow {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 44px; height: 44px; border-radius: 12px;
-    background: var(--surface); border: 1.5px solid var(--blue); color: var(--blue-deep); cursor: pointer;
-  }
-  .gal-arrow:hover { background: var(--blue-tint); }
-  .gal-dot {
-    width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
-    background: none; border: 0; cursor: pointer; padding: 0;
-  }
-  .gal-dot::after {
-    content: ""; width: 9px; height: 9px; border-radius: 999px;
-    background: #6E8098; transition: width 0.2s ease, background 0.2s ease;
-  }
-  .gal-dot[aria-current="true"]::after { width: 24px; background: var(--blue); }
-  .gal-static { display: grid; gap: 24px; }
-  @media (min-width: 640px) { .gal-static { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); } }
-  .gal-static figcaption { font-size: 0.85rem; color: var(--ink-2); margin-top: 8px; }
-
-  /* Wizard cara mulai: band putih menandai zona interaktif di antara dua section abu-abu.
-     Dengan JS, panel dan screenshot ditumpuk di satu sel grid sehingga tinggi stabil dan
-     pergantian langkah jadi crossfade; tanpa JS ketiga langkah tampil berurutan biasa. */
-  .wizard { background: var(--surface); border-block: 1px solid var(--line); }
-  .wiz-grid { display: grid; gap: 44px; align-items: center; }
-  @media (min-width: 880px) { .wiz-grid { grid-template-columns: 1.05fr 0.95fr; gap: 56px; } }
-  .wiz { margin-top: 22px; }
-  .wiz-counter { display: none; align-items: center; margin-bottom: 18px; }
-  html.js .wiz-counter { display: flex; }
-  .wiz-panel h3 { font-size: 1.45rem; margin-bottom: 10px; }
-  .wiz-panel p { max-width: 46ch; }
-  html.js .wiz-panels, html.js .wiz-shots { display: grid; }
-  html.js .wiz-shots { width: 100%; }
-  html.js .wiz-panel { grid-area: 1 / 1; opacity: 0; visibility: hidden; }
-  html.js .wiz-panel.is-on { opacity: 1; visibility: visible; }
-  html.js .wiz-shot { grid-area: 1 / 1; opacity: 0; }
-  html.js .wiz-shot.is-on { opacity: 1; }
-  /* Gambar yang sedang tidak tampil tidak boleh menerima sentuhan, kalau tidak slider langkah dua
-     diam-diam menyerap geseran saat langkah lain yang aktif. */
-  html.js .wiz-shot { pointer-events: none; }
-  html.js .wiz-shot.is-on { pointer-events: auto; }
-  /* Pergantian langkah: panel baru naik-fade seperti caption galeri, panel lama memudar.
-     Transisi interaksi, sesuai dial MOTION halaman. */
-  @media (prefers-reduced-motion: no-preference) {
-    html.js .wiz-panel { transition: opacity 0.3s ease, visibility 0s 0.3s; }
-    html.js .wiz-panel.is-on { transition-delay: 0s; animation: cap-in 0.35s ease; }
-    html.js .wiz-shot { transition: opacity 0.35s ease; }
-  }
-  .wiz-nav { display: none; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
-  html.js .wiz-nav { display: flex; }
-  .wiz-phone { --wiz-slide-w: var(--slide-w); display: flex; flex-direction: column; align-items: center; gap: 12px; }
-  @media (min-width: 880px) { .wiz-phone { --wiz-slide-w: 300px; } }
-  /* Langkah dua memuat dua contoh catatan (BBM dan servis). Tiap gambar dibungkus frame ponsel
-     sendiri dan frame itu ikut bergeser, sama seperti carousel Tampilan: tetangga mengintip di
-     tepi dan yang tidak aktif meredup, jadi jelas masih ada gambar lain di sebelahnya.
-     Titik penanda duduk di atas frame supaya terlihat sebelum digulir. */
-  html.js .wiz-shot { display: grid; justify-items: center; }
-  html.js .wiz-shot .phone { width: var(--wiz-slide-w); max-width: none; }
-  html.js .wiz-slider {
-    display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory;
-    width: 100%; padding-block: 10px 14px;
-    padding-inline: calc((100% - var(--wiz-slide-w)) / 2);
-    scrollbar-width: none; cursor: grab;
-  }
-  /* Di layar sempit track melebar sampai tepi container supaya slide sebelahnya benar-benar
-     mengintip — itulah petunjuk bahwa masih ada gambar lain untuk digeser. Padding ikut
-     menghitung tambahan 40px itu supaya slide tetap pas di tengah. */
-  @media (max-width: 879.98px) {
-    html.js .wiz-slider {
-      width: calc(100% + 40px); margin-inline: -20px;
-      padding-inline: calc((100% + 40px - var(--wiz-slide-w)) / 2);
-    }
-  }
-  html.js .wiz-slider::-webkit-scrollbar { display: none; }
-  html.js .wiz-slider.dragging { cursor: grabbing; scroll-snap-type: none; }
-  html.js .wiz-slider.dragging .wiz-slide { pointer-events: none; }
-  html.js .wiz-slide { flex: 0 0 auto; width: var(--wiz-slide-w); scroll-snap-align: center; }
-  .wiz-slide:not(.is-active) { opacity: 0.5; transform: scale(0.96); }
-  .wiz-slide.is-active .phone { box-shadow: 0 24px 48px -20px rgba(13, 43, 82, 0.35); }
-  @media (prefers-reduced-motion: no-preference) {
-    .wiz-slide { transition: opacity 0.25s ease, transform 0.25s ease; }
-  }
-  .wiz-dots { width: 100%; max-width: var(--wiz-slide-w); justify-content: center; gap: 2px; }
-  html.js .wiz-dots { display: flex; }
-  .wiz-dot {
-    width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
-    background: none; border: 0; padding: 0; cursor: pointer;
-  }
-  .wiz-dot::after {
-    content: ""; width: 9px; height: 9px; border-radius: 999px;
-    background: #6E8098; transition: width 0.2s ease, background 0.2s ease;
-  }
-  .wiz-dot[aria-current="true"]::after { width: 24px; background: var(--blue); }
-
-  /* Overlay onboarding: replika langkah pertama onboarding aplikasi (lib/features/onboarding),
-     teks, warna, dan perilakunya disamakan: logo mobil yang bisa diketuk (getar + gelombang
-     mesin menyala) dan tombol Mulai. Tampil di setiap muat halaman, dibuka lewat JS supaya
-     tanpa JS landing tetap utuh. */
-  .ob {
-    position: fixed; inset: 0; z-index: 200;
-    background: var(--surface);
-    display: flex; flex-direction: column;
-  }
-  body.ob-lock { overflow: hidden; }
-  .ob-body {
-    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; padding: 16px 24px; max-width: 30rem; margin-inline: auto; width: 100%;
-  }
-  .ob-title { font-size: clamp(1.7rem, 5vw, 2.1rem); font-weight: 800; }
-  .ob-sub { margin-top: 10px; font-size: 0.98rem; max-width: 34ch; }
-  .ob-logo {
-    position: relative; width: 234px; height: 234px; margin-top: 34px;
-    background: none; border: 0; padding: 0; cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .ob-core {
-    position: absolute; inset: 0; margin: auto;
-    width: 130px; height: 130px; border-radius: 50%;
-    background: #fff; box-shadow: 0 18px 36px -16px rgba(13, 43, 82, 0.45);
-  }
-  .ob-core::after {
-    content: ""; position: absolute; inset: 8px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--blue), var(--blue-deep));
-  }
-  .ob-car {
-    position: absolute; inset: 0; z-index: 1; margin: auto;
-    width: 58px; height: 58px; line-height: 58px; text-align: center;
-    color: #fff; font-size: 58px;
-    font-variation-settings: "FILL" 1, "wght" 400, "opsz" 48;
-  }
-  .ob-bubble {
-    position: absolute; width: 40px; height: 40px; border-radius: 50%;
-    background: #fff; box-shadow: 0 8px 20px -14px rgba(13, 43, 82, 0.35);
-    display: flex; align-items: center; justify-content: center;
-    color: var(--blue);
-  }
-  .ob-bubble .ms { font-size: 18px; font-variation-settings: "FILL" 1, "wght" 400, "opsz" 24; }
-  .ob-bubble.b0 { right: 25px; bottom: 25px; }
-  .ob-bubble.b1 { left: 25px; bottom: 25px; }
-  .ob-bubble.b2 { right: 25px; top: 25px; }
-  .ob-bubble.b3 { left: 25px; top: 25px; }
-  .ob-wave {
-    position: absolute; inset: 0; margin: auto; width: 156px; height: 156px;
-    border-radius: 50%; border: 2px solid rgba(0, 91, 191, 0.3);
-    opacity: 0; pointer-events: none;
-  }
-  .ob-wave.w2 { border-color: rgba(0, 91, 191, 0.2); }
-  .ob-wave.w3 { border-color: rgba(0, 91, 191, 0.1); }
-  .ob-hint {
-    margin-top: 26px; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.3px;
-    color: rgba(0, 91, 191, 0.8);
-  }
-  .ob-start {
-    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-    margin-top: 34px;
-    min-height: 48px; padding: 12px 26px; border: 0; border-radius: 999px;
-    background: var(--blue); color: #fff;
-    font: 600 1rem var(--font-body); cursor: pointer;
-  }
-  .ob-start:hover { background: var(--blue-hover); }
-  .ob-start .ms { font-size: 15px; }
-  @media (prefers-reduced-motion: no-preference) {
-    .ob { transition: transform 0.45s ease-in; animation: ob-fade 0.25s ease; }
-    /* Keluar: menggeser seluruh overlay ke atas sampai tuntas, menyerahkan panggung ke landing. */
-    .ob.ob-out { transform: translateY(-100%); }
-    @keyframes ob-fade { from { opacity: 0; } }
-    /* Masuk seperti aplikasi: teks reveal, logo memantul elastic, gelembung fitur
-       bergiliran diagonal. Semuanya sekali jalan. */
-    .ob-title, .ob-sub, .ob-hint { animation: cap-in 0.5s ease backwards; }
-    .ob-sub { animation-delay: 0.1s; }
-    .ob-hint { animation-delay: 0.45s; }
-    .ob-core { animation: ob-core-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
-    .ob-bubble { animation: ob-bubble-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
-    .ob-bubble.b0 { animation-delay: 0.3s; --fx: -30px; --fy: -30px; }
-    .ob-bubble.b1 { animation-delay: 0.45s; --fx: 30px; --fy: -30px; }
-    .ob-bubble.b2 { animation-delay: 0.6s; --fx: -30px; --fy: 30px; }
-    .ob-bubble.b3 { animation-delay: 0.75s; --fx: 30px; --fy: 30px; }
-    /* Ketukan: getar mesin + pop skala, lalu tiga gelombang memuai dan memudar.
-       Keempat pilar berdenyut berurutan setiap rev — gema dari stagger diagonal masuknya. */
-    .ob-logo.rev .ob-core { animation: ob-shake 0.4s ease-in-out, ob-pop 0.3s ease; }
-    .ob-logo.rev .ob-wave { animation: ob-wave-out 0.6s ease-out forwards; }
-    .ob-logo.rev .ob-wave.w2 { animation-duration: 0.8s; }
-    .ob-logo.rev .ob-wave.w3 { animation-duration: 1s; }
-    .ob-logo.rev .ob-bubble { animation: ob-bubble-pop 0.5s ease; }
-    .ob-logo.rev .ob-bubble.b1 { animation-delay: 0.08s; }
-    .ob-logo.rev .ob-bubble.b2 { animation-delay: 0.16s; }
-    .ob-logo.rev .ob-bubble.b3 { animation-delay: 0.24s; }
-    .ob-start:active { transform: translateY(1px); }
-  }
-  @keyframes ob-core-in { from { transform: scale(0.3); } }
-  @keyframes ob-bubble-in { from { opacity: 0; transform: translate(var(--fx, 0), var(--fy, 0)); } }
-  @keyframes ob-bubble-pop {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.28); }
-    100% { transform: scale(1); }
-  }
-  @keyframes ob-shake {
-    0%, 100% { transform: translateX(0) rotate(0); }
-    10% { transform: translateX(-3px) rotate(-2deg); }
-    20% { transform: translateX(3px) rotate(2deg); }
-    30% { transform: translateX(-3px) rotate(-1.5deg); }
-    45% { transform: translateX(3px) rotate(1.5deg); }
-    60% { transform: translateX(-2px) rotate(-1deg); }
-    80% { transform: translateX(2px) rotate(0.5deg); }
-  }
-  @keyframes ob-pop {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.12); }
-    100% { transform: scale(1); }
-  }
-  @keyframes ob-wave-out {
-    from { opacity: 0.9; transform: scale(0.8); }
-    to { opacity: 0; transform: scale(1.3); }
-  }
-
-  /* Privasi: satu-satunya band gelap, diberi ke pembeda terkuat produk agar hierarki terasa. */
-  .privasi { background: var(--navy); }
-  .privasi .sec-head { max-width: 720px; }
-  .privasi h2 { color: #fff; }
-  .privasi-lead { color: var(--navy-ink); font-size: 1.05rem; max-width: 58ch; }
-  .fact-grid { display: grid; gap: 24px; margin-top: 36px; }
-  @media (min-width: 720px) { .fact-grid { grid-template-columns: repeat(3, 1fr); } }
-  .fact .feat-icon { background: rgba(255, 255, 255, 0.1); color: var(--navy-icon); }
-  .fact h3 { color: #fff; font-size: 1.02rem; margin: 12px 0 4px; }
-  .fact p { color: var(--navy-ink); font-size: 0.92rem; }
-  .privasi-backup {
-    display: flex; gap: 14px; align-items: flex-start;
-    margin-top: 36px; padding-top: 28px; border-top: 1px solid rgba(255, 255, 255, 0.16);
-    max-width: 720px;
-  }
-  .privasi-backup .feat-icon { background: rgba(255, 255, 255, 0.1); color: var(--navy-icon); }
-  .privasi-backup p { color: var(--navy-ink); }
-  .privasi-backup code {
-    font-family: ui-monospace, "Cascadia Mono", monospace; font-size: 0.9em;
-    background: rgba(255, 255, 255, 0.1); color: #fff; padding: 1px 7px; border-radius: 5px;
-  }
-
-  /* FAQ */
-  .faq-wrap { max-width: 760px; }
-  .faq-item { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 12px; }
-  .faq-q {
-    display: flex; align-items: center; justify-content: space-between; gap: 16px;
-    width: 100%; min-height: 44px; padding: 16px 18px;
-    background: none; border: 0; cursor: pointer;
-    font: 600 1rem var(--font-body); color: var(--ink); text-align: left;
-  }
-  .faq-q .ms { color: var(--ink-2); transition: transform 0.2s ease; }
-  .faq-item.open .faq-q .ms { transform: rotate(180deg); }
-  .faq-a { display: grid; grid-template-rows: 0fr; }
-  .faq-item.open .faq-a { grid-template-rows: 1fr; }
-  @media (prefers-reduced-motion: no-preference) {
-    .faq-a { transition: grid-template-rows 0.25s ease; }
-    .faq-q .ms { transition: transform 0.2s ease; }
-  }
-  .faq-a-inner { overflow: hidden; }
-  .faq-a-inner p { padding: 0 18px 18px; font-size: 0.95rem; }
-
-  /* CTA akhir */
-  .cta-final { text-align: center; }
-  .cta-final .sec-head { margin-inline: auto; text-align: center; }
-  .cta-note { font-size: 0.88rem; margin-top: 14px; }
-
-  footer { background: var(--surface); border-top: 1px solid var(--line); padding: 28px 0; }
-  .foot-in { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
-  .foot-in .brand b { font-size: 1.05rem; }
-  .foot-in p { font-size: 0.88rem; }
-  .foot-links { margin-left: auto; display: flex; gap: 20px; }
-  .foot-links a { color: var(--blue-deep); font-size: 0.9rem; font-weight: 500; text-decoration: none; }
-  .foot-links a:hover { text-decoration: underline; }
-  /* Ponsel: footer jadi satu kolom rata kiri — margin-left:auto milik desktop menggantungkan
-     email sendirian di tepi kanan begitu baris patah. Link email diberi tinggi sentuh 44px.
-     Override diletakkan setelah aturan dasar .foot-in agar align-items tidak ketimpa. */
-  @media (max-width: 719px) {
-    .foot-in { flex-direction: column; align-items: flex-start; }
-    .foot-links { margin-left: 0; }
-    .foot-links a { display: inline-block; padding: 12px 0; }
-  }
-
-  /* Reveal: fade + naik kecil, sekali jalan, hanya saat JS aktif dan user tak mematikan motion. */
-  @media (prefers-reduced-motion: no-preference) {
-    html.js .reveal { opacity: 0; transform: translateY(14px); }
-    html.js .reveal.in { opacity: 1; transform: none; transition: opacity 0.5s ease, transform 0.5s ease; }
-    /* Hero: anak-anaknya masuk bergiliran (judul → sub → CTA → fakta) supaya urutan fokus
-       pembaca terpandu; mockup HP menyusul belakangan. Tetap sekali jalan, tanpa loop. */
-    html.js .reveal.stagger { opacity: 1; transform: none; transition: none; }
-    html.js .stagger:not(.in) > * { opacity: 0; transform: translateY(14px); }
-    html.js .stagger.in > * { opacity: 1; transform: none; transition: opacity 0.5s ease, transform 0.5s ease; }
-    html.js .stagger.in > *:nth-child(2) { transition-delay: 0.08s; }
-    html.js .stagger.in > *:nth-child(3) { transition-delay: 0.16s; }
-    html.js .stagger.in > *:nth-child(4) { transition-delay: 0.24s; }
-    html.js .hero-phone.in { transition-delay: 0.15s; }
-  }
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <a class="skip" href="#konten">Langsung ke konten</a>
@@ -641,13 +36,17 @@
       <img src="images/app_icon.png" alt="" width="28" height="28">
       <b>CarBuddy</b>
     </a>
+    <!-- Status, bukan tindakan: menandai aplikasinya masih uji coba tertutup.
+         Titiknya menandai keadaan nyata itu dan tidak berdenyut. Tautannya
+         tombol di kanan, jadi lencana ini sengaja bukan link kedua ke #beta. -->
+    <span class="head-badge"><span class="head-dot" aria-hidden="true"></span>Early Access</span>
     <nav class="nav-links" aria-label="Navigasi utama">
       <a href="#fitur" data-spy>Fitur</a>
       <a href="#tampilan" data-spy>Tampilan</a>
       <a href="#privasi" data-spy>Privasi</a>
       <a href="#faq" data-spy>FAQ</a>
     </nav>
-    <a class="btn btn-primary head-cta" href="#unduh">Unduh APK</a>
+    <a class="btn btn-primary head-cta" href="#beta"><span class="ms" aria-hidden="true">science</span>Early Access</a>
     <button class="burger" id="burger" aria-expanded="false" aria-controls="mobile-menu" aria-label="Buka menu">
       <span class="ms" aria-hidden="true">menu</span>
     </button>
@@ -658,7 +57,7 @@
       <a href="#tampilan">Tampilan</a>
       <a href="#privasi">Privasi</a>
       <a href="#faq">FAQ</a>
-      <a href="#unduh"><strong>Unduh APK</strong></a>
+      <a href="#beta"><strong>Early Access</strong></a>
     </div>
   </nav>
 </header>
@@ -669,13 +68,13 @@
     <div class="container">
       <div class="hero-grid">
         <div class="reveal stagger">
-          <h1>Kapan servis berikutnya? <span>Sudah tercatat.</span></h1>
+          <h1>Kapan servis berikutnya? <span>Sudah tercatat dong!</span></h1>
           <p class="hero-sub">Odometer, BBM, servis, pajak, sampai asuransi tercatat rapi di satu aplikasi, di HP-mu sendiri.</p>
           <div class="hero-cta">
-            <a class="btn btn-primary" href="#unduh"><span class="ms" aria-hidden="true">download</span>Unduh APK</a>
+            <a class="btn btn-primary hero-cta-main" href="#beta"><span class="ms" aria-hidden="true">science</span>Ikut Early Access<span class="ms cta-arrow" aria-hidden="true">arrow_forward</span></a>
             <a class="btn btn-ghost" href="#fitur">Lihat fiturnya</a>
           </div>
-          <p class="hero-facts"><span>Gratis</span><span aria-hidden="true">·</span><span>Tanpa akun</span><span aria-hidden="true">·</span><span>Offline penuh</span></p>
+          <p class="hero-facts"><span>2 bulan pertama gratis</span><span aria-hidden="true">·</span><span>Tanpa akun</span><span aria-hidden="true">·</span><span>Catat tanpa internet</span></p>
         </div>
         <div class="hero-phone reveal">
           <div class="phone">
@@ -890,7 +289,7 @@
           <div class="wiz-nav">
             <button class="btn btn-ghost" id="wiz-prev" type="button"><span class="ms" aria-hidden="true">chevron_left</span>Kembali</button>
             <button class="btn btn-primary" id="wiz-next" type="button">Lanjut<span class="ms" aria-hidden="true">chevron_right</span></button>
-            <a class="btn btn-primary" id="wiz-cta" href="#unduh" hidden><span class="ms" aria-hidden="true">download</span>Unduh APK</a>
+            <a class="btn btn-primary" id="wiz-cta" href="#beta" hidden><span class="ms" aria-hidden="true">group_add</span>Early Access</a>
           </div>
         </div>
       </div>
@@ -953,7 +352,7 @@
       <div class="sec-head reveal">
         <span class="plate">Privasi</span>
         <h2 id="privasi-h">Data tinggal di HP kamu.</h2>
-        <p class="privasi-lead">CarBuddy tidak punya server dan tidak meminta akun. Semua catatan tersimpan di database HP-mu sendiri, jadi aplikasinya tetap jalan kapan pun, di mana saja, tanpa sinyal.</p>
+        <p class="privasi-lead">CarBuddy tidak punya server dan tidak meminta akun. Semua catatan tersimpan di database HP-mu sendiri, jadi kamu bisa mencatat kapan pun, di mana saja, tanpa sinyal.</p>
       </div>
       <div class="fact-grid">
         <div class="fact reveal">
@@ -963,13 +362,13 @@
         </div>
         <div class="fact reveal">
           <div class="feat-icon"><span class="ms" aria-hidden="true">wifi_off</span></div>
-          <h3>Bekerja offline penuh</h3>
-          <p>Semua fitur jalan tanpa internet, dari catatan sampai grafik.</p>
+          <h3>Mencatat tanpa internet</h3>
+          <p>Semua pencatatan jalan tanpa sinyal, dari odometer sampai grafik. Internet hanya dipakai untuk pembelian dan memeriksa lisensi.</p>
         </div>
         <div class="fact reveal">
           <div class="feat-icon"><span class="ms" aria-hidden="true">verified_user</span></div>
           <h3>Tanpa iklan, tanpa telemetry</h3>
-          <p>Tidak ada data yang dikirim ke mana pun, titik.</p>
+          <p>Tanpa analitik, tanpa pelacak, tanpa telemetri. Satu-satunya koneksi keluar adalah Google Play, untuk memproses pembelian.</p>
         </div>
       </div>
       <div class="privasi-backup reveal">
@@ -994,13 +393,13 @@
       <div class="faq-item reveal">
         <h3><button class="faq-q" id="faq-q2" aria-expanded="false" aria-controls="faq-a2">Perlu akun atau internet?<span class="ms" aria-hidden="true">expand_more</span></button></h3>
         <div class="faq-a" id="faq-a2" role="region" aria-labelledby="faq-q2">
-          <div class="faq-a-inner"><p>Tidak. Tidak ada login, dan semua fitur jalan offline penuh. Internet cuma perlu kalau kamu mau mengirim file backup ke teman atau ke email.</p></div>
+          <div class="faq-a-inner"><p>Tidak ada login. Semua pencatatan jalan tanpa internet, termasuk grafik dan pengingat. Internet hanya perlu untuk pembelian dan pemeriksaan lisensi, dan itu pun dicek berkala, bukan tiap kali buka aplikasi.</p></div>
         </div>
       </div>
       <div class="faq-item reveal">
         <h3><button class="faq-q" id="faq-q3" aria-expanded="false" aria-controls="faq-a3">Apakah CarBuddy gratis?<span class="ms" aria-hidden="true">expand_more</span></button></h3>
         <div class="faq-a" id="faq-a3" role="region" aria-labelledby="faq-q3">
-          <div class="faq-a-inner"><p>Ya, gratis. Tidak ada iklan dan tidak ada pembelian di dalam aplikasi.</p></div>
+          <div class="faq-a-inner"><p>Dua bulan pertama gratis. Setelah itu CarBuddy berlanjut sebagai langganan tahunan Rp 12.000, atau kamu bisa beli lisensi seumur hidup Rp 25.000 sekali bayar. Tidak ada iklan di dalamnya, dan tidak ada pembelian lain selain dua pilihan itu.</p></div>
         </div>
       </div>
       <div class="faq-item reveal">
@@ -1024,17 +423,102 @@
     </div>
   </section>
 
-  <section class="cta-final" id="unduh" aria-labelledby="unduh-h">
+  <section class="beta" id="beta" aria-labelledby="beta-h">
     <div class="container">
       <div class="sec-head reveal">
-        <span class="plate">Gratis untuk Android</span>
-        <h2 id="unduh-h">Mulai dari catatan berikutnya.</h2>
-        <p>Tambahkan kendaraan pertamamu, catat satu pengisian BBM, dan biarkan pengingat CarBuddy yang ingat sisanya.</p>
+        <span class="plate">Early Access</span>
+        <h2 id="beta-h">Ikut uji coba tertutup, <span>dapat akses seumur hidup.</span></h2>
+        <p>CarBuddy sedang diuji lewat uji coba tertutup Google Play. Kami butuh pengguna yang benar-benar memakai aplikasinya sehari-hari, dan yang ikut sampai selesai dapat akses seumur hidup tanpa bayar.</p>
       </div>
-      <div class="reveal">
-        <!-- TODO: setelah APK rilis publik, ganti mailto ini dengan link unduhan (Play Store / GitHub Releases). -->
-        <a class="btn btn-primary btn-lg" href="mailto:dev@azmirf.my.id?subject=Minta%20APK%20CarBuddy"><span class="ms" aria-hidden="true">download</span>Unduh APK</a>
-        <p class="cta-note">Tombol di atas membuka draf email ke pengembang, dan file APK dikirim balik ke emailmu.</p>
+
+      <ol class="beta-steps reveal stagger">
+        <li>
+          <span class="beta-step-icon ms" aria-hidden="true">edit_note</span>
+          <b>Daftar di bawah</b>
+          <span class="beta-step-copy">Isi email akun Google Play-mu. Kami kirim undangan uji coba begitu kuota gelombang dibuka.</span>
+        </li>
+        <li>
+          <span class="beta-step-icon ms" aria-hidden="true">play_circle</span>
+          <b>Masuk uji coba</b>
+          <span class="beta-step-copy">Terima undangan di Google Play, lalu pasang CarBuddy lewat link "jadi tester" itu.</span>
+        </li>
+        <li>
+          <span class="beta-step-icon ms" aria-hidden="true">smartphone</span>
+          <b>Pakai sungguhan</b>
+          <span class="beta-step-copy">Catat odometer, BBM, dan servis seperti pemakaian biasa selama masa uji.</span>
+        </li>
+        <li>
+          <span class="beta-step-icon ms" aria-hidden="true">redeem</span>
+          <b>Klaim aksesnya</b>
+          <span class="beta-step-copy">Setelah masa uji selesai, kami kirim satu kode lewat WhatsApp atau email, sesuai jalur yang kamu pakai saat mendaftar.</span>
+        </li>
+      </ol>
+
+      <div class="beta-reward reveal">
+        <span class="beta-reward-icon ms" aria-hidden="true">redeem</span>
+        <div class="beta-reward-body">
+          <h3>Yang kamu dapat: akses seumur hidup</h3>
+          <p>Lisensi seumur hidup membuka <strong>semua fitur CarBuddy, yang ada sekarang maupun yang ditambahkan nanti</strong>, permanen di akun Google-mu. Tidak ada tagihan berikutnya.</p>
+          <p>Syaratnya satu: kamu harus tetap terdaftar sebagai tester dan benar-benar memakai aplikasinya selama 14 hari, karena itu periode yang diminta Google Play. Jika tidak, Google tidak menganggap uji cobanya sah dan kodenya belum bisa kami kirim.</p>
+        </div>
+        <p class="beta-reward-badge"><span class="ms" aria-hidden="true">verified</span>Tanpa bayar</p>
+      </div>
+
+      <div class="beta-cta">
+        <form class="beta-form reveal" id="beta-form" novalidate>
+          <h3 class="beta-form-title">Daftar sebagai tester</h3>
+
+          <div class="beta-field">
+            <label for="beta-email">Email akun Google Play <span aria-hidden="true">*</span></label>
+            <input type="email" id="beta-email" name="email" required autocomplete="email" inputmode="email" placeholder="nama@gmail.com">
+            <span class="hint">Pakai alamat yang sama dengan akun Google di HP-mu, karena link uji coba terikat ke akun itu.</span>
+          </div>
+
+          <div class="beta-field">
+            <label for="beta-device">Tipe HP <span class="hint">(opsional)</span></label>
+            <input type="text" id="beta-device" name="device" placeholder="mis. Samsung A54, Android 14">
+            <span class="hint">Membantu kami memastikan aplikasinya jalan di beragam perangkat.</span>
+          </div>
+
+          <div class="beta-check">
+            <input type="checkbox" id="beta-ack" name="ack" required>
+            <label for="beta-ack">Saya mengerti bahwa saya harus tetap terdaftar sebagai tester dan aktif memakai aplikasinya selama masa uji, supaya hadiah akses seumur hidup bisa diberikan.</label>
+          </div>
+
+          <p class="beta-error" id="beta-error" role="alert">Email dan persetujuan di atas wajib diisi dulu.</p>
+
+          <button class="btn btn-primary btn-lg" type="submit">
+            <span class="ms" aria-hidden="true">forum</span>
+            <span class="beta-btn-label">Daftar lewat WhatsApp<small>Uji coba tertutup, akses seumur hidup</small></span>
+          </button>
+
+          <ul class="beta-facts">
+            <li><span class="ms" aria-hidden="true">redeem</span>Hadiah akses seumur hidup</li>
+            <li><span class="ms" aria-hidden="true">play_circle</span>Program resmi Google Play</li>
+            <li><span class="ms" aria-hidden="true">credit_card_off</span>Tidak ada pembayaran</li>
+            <li><span class="ms" aria-hidden="true">shield_lock</span>Email tidak dijual atau dibagikan</li>
+          </ul>
+
+          <p class="beta-alt">Belum pakai WhatsApp? <a href="#" id="beta-mail">Kirim pendaftaran lewat email</a></p>
+        </form>
+
+        <div class="beta-aside">
+          <div class="beta-card">
+            <h4><span class="ms" aria-hidden="true">visibility</span>Mau coba lebih dulu?</h4>
+            <p>Sambil menunggu undangan, baca dulu apa saja yang bisa dicatat CarBuddy.</p>
+            <a class="beta-card-link" href="#fitur"><span class="ms" aria-hidden="true">grid_view</span>Lihat daftar fiturnya</a>
+          </div>
+
+          <div class="beta-card">
+            <h4>Apa yang tester lakukan</h4>
+            <ul class="beta-card-list">
+              <li><span class="ms" aria-hidden="true">check</span>Tetap terdaftar lewat link uji coba Play</li>
+              <li><span class="ms" aria-hidden="true">check</span>Memakai aplikasinya selama masa uji</li>
+              <li><span class="ms" aria-hidden="true">check</span>Kirim masukan lewat formulir Play</li>
+              <li><span class="ms" aria-hidden="true">check</span>Laporkan kendala ke email kami</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -1042,14 +526,41 @@
 </main>
 
 <footer>
-  <div class="container foot-in">
-    <a class="brand" href="#top">
-      <img src="images/app_icon.png" alt="" width="24" height="24">
-      <b>CarBuddy</b>
-    </a>
-    <p>© 2026 CarBuddy. All rights reserved.</p>
-    <div class="foot-links">
-      <a href="mailto:dev@azmirf.my.id">dev@azmirf.my.id</a>
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#top">
+          <img src="images/app_icon.png" alt="" width="28" height="28">
+          <b>CarBuddy</b>
+        </a>
+        <p>Mencatat odometer, BBM, servis, pajak, dan asuransi kendaraan. Semua tersimpan di HP-mu sendiri, tanpa akun dan tanpa server.</p>
+        <a class="foot-mail" href="mailto:dev@azmirf.my.id"><span class="ms" aria-hidden="true">mail</span>dev@azmirf.my.id</a>
+      </div>
+
+      <nav class="foot-col" aria-labelledby="foot-app-h">
+        <h2 id="foot-app-h">Aplikasi</h2>
+        <ul>
+          <li><a href="#fitur">Fitur</a></li>
+          <li><a href="#tampilan">Tampilan</a></li>
+          <li><a href="#mulai">Cara mulai</a></li>
+          <li><a href="#privasi">Privasi</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </nav>
+
+      <nav class="foot-col" aria-labelledby="foot-legal-h">
+        <h2 id="foot-legal-h">Legal &amp; bantuan</h2>
+        <ul>
+          <li><a href="privacy.html">Kebijakan Privasi</a></li>
+          <li><a href="terms.html">Ketentuan Layanan</a></li>
+          <li><a href="#beta">Ikut uji coba</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="foot-bar">
+      <p>© 2026 CarBuddy. All rights reserved.</p>
+      <p class="foot-note">Closed testing via Google Play</p>
     </div>
   </div>
 </footer>
@@ -1076,508 +587,6 @@
   </div>
 </div>
 
-<script>
-document.documentElement.classList.add('js');
-
-const SCREENSHOTS = [
-  {
-    src: 'images/home.jpg',
-    alt: 'Beranda CarBuddy: kartu kendaraan Toyota Avanza dengan odometer 40.450 km, ringkasan pengeluaran bulan ini, dan kewajiban terdekat',
-    caption: 'Beranda: status kendaraan, pengeluaran bulan ini, dan kewajiban terdekat.'
-  },
-  {
-    src: 'images/timeline.jpg',
-    alt: 'Tab Timeline dengan chip filter dan daftar catatan BBM, odometer, serta pengeluaran per kendaraan',
-    caption: 'Timeline: semua catatan terurut, bisa disaring per kategori.'
-  },
-  {
-    src: 'images/insights.jpg',
-    alt: 'Tab Insights dengan kartu jarak tempuh, efisiensi BBM 48,3 km/L, total pengeluaran, dan grafik tren',
-    caption: 'Insight: jarak, konsumsi, dan pengeluaran per kendaraan, lengkap dengan trennya.'
-  },
-  {
-    src: 'images/reminders.jpg',
-    alt: 'Tab Reminders dengan banner Perlu Perhatian untuk pajak dan daftar pengingat berhitungan hari',
-    caption: 'Pengingat: pajak, asuransi, dan servis dengan hitungan hari sebelum jatuh tempo.'
-  },
-  {
-    src: 'images/more.jpg',
-    alt: 'Menu More berisi grid modul Vehicles, Maintenance, Fuel Logs, Expense List, Vehicle Tax, Insurance, Tires, dan Battery',
-    caption: 'Semua modul: kendaraan, perawatan, BBM, pengeluaran, pajak, asuransi, ban, sampai aki.'
-  },
-  {
-    src: 'images/maintenance.jpg',
-    alt: 'Tab Perawatan dengan ringkasan biaya Rp3.820.000, 10 perawatan, 4 jadwal, dan daftar servis berikutnya per kendaraan',
-    caption: 'Perawatan: biaya, riwayat servis, dan jadwal berikutnya per kendaraan.'
-  },
-  {
-    src: 'images/detail-maintenance.jpg',
-    alt: 'Halaman detail servis CarBuddy: tanggal dan bengkel servis, rincian biaya per komponen dengan totalnya, jadwal servis berikutnya, dan aksi catat servis lanjutan',
-    caption: 'Detail servis: rincian biaya per komponen, jadwal berikutnya, dan tautan ke servis lanjutan.'
-  }
-];
-
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-// Galeri: slide dan dot dibangun dari SCREENSHOTS supaya caption dan alt editnya di satu tempat.
-// Ujung track diberi klon slide terakhir & pertama supaya next/prev loop mulus (infinite).
-const track = document.getElementById('gal-track');
-const dotsWrap = document.getElementById('gal-dots');
-const captionEl = document.getElementById('gal-caption');
-const gal = document.getElementById('gal');
-const n = SCREENSHOTS.length;
-const trackCfg = [SCREENSHOTS[n - 1]].concat(SCREENSHOTS, [SCREENSHOTS[0]]);
-const dots = [];
-let active = 0;       // index ASLI (0..n-1) yang tampil di UI
-let suppress = false; // true selama animasi programatik: scroll listener tidak menulis UI
-let animId = null;
-
-const realFromTrack = (k) => (k <= 0 ? n - 1 : k > n ? 0 : k - 1);
-const trackFromReal = (r) => r + 1;
-
-function makeSlide(cfg, k) {
-  const fig = document.createElement('figure');
-  fig.className = 'gal-slide';
-  fig.dataset.real = String(realFromTrack(k));
-  fig.innerHTML =
-    '<div class="phone"><div class="phone-screen">' +
-    '<img src="' + cfg.src + '" alt="' + cfg.alt + '" width="1080" height="2340"' +
-    (k === 1 ? '' : ' loading="lazy"') + ' decoding="async">' +
-    '<span class="punch" aria-hidden="true"></span></div></div>';
-  fig.addEventListener('click', () => goReal(realFromTrack(k)));
-  return fig;
-}
-trackCfg.forEach((cfg, k) => track.appendChild(makeSlide(cfg, k)));
-
-SCREENSHOTS.forEach((s, i) => {
-  const dot = document.createElement('button');
-  dot.className = 'gal-dot';
-  dot.type = 'button';
-  dot.setAttribute('aria-label', 'Screenshot ' + (i + 1) + ' dari ' + n + ': ' + s.caption);
-  dot.addEventListener('click', () => goReal(i));
-  dotsWrap.appendChild(dot);
-  dots.push(dot);
-});
-
-// update() selalu menerima index ASLI; klon yang mewakili slide itu ikut menyala saat transit.
-function update(i) {
-  active = i;
-  Array.prototype.forEach.call(track.children, (el) => {
-    const on = Number(el.dataset.real) === i;
-    el.classList.toggle('is-active', on);
-    el.setAttribute('aria-hidden', on ? 'false' : 'true');
-  });
-  dots.forEach((d, k) => d.setAttribute('aria-current', k === i ? 'true' : 'false'));
-  const cap = SCREENSHOTS[i].caption;
-  if (captionEl.textContent !== cap) {
-    captionEl.textContent = cap;
-    if (!reduceMotion) {
-      captionEl.classList.remove('swap');
-      void captionEl.offsetWidth;
-      captionEl.classList.add('swap');
-    }
-  }
-  const num = String(i + 1).padStart(2, '0');
-  rollOdo(odoStrips, num);
-}
-
-// Pusat slide diukur dalam frame konten scroll track (rect + scrollLeft), bukan offsetLeft
-// yang mengacu ke ancestor lain — campur frame membuat nearest() salah pilih saat drag pendek.
-function slideCenter(el) {
-  const tr = track.getBoundingClientRect();
-  const er = el.getBoundingClientRect();
-  return er.left + er.width / 2 - tr.left + track.scrollLeft;
-}
-
-function nearestTrack() {
-  const center = track.scrollLeft + track.clientWidth / 2;
-  let best = 0, bd = Infinity;
-  Array.prototype.forEach.call(track.children, (el, k) => {
-    const d = Math.abs(slideCenter(el) - center);
-    if (d < bd) { bd = d; best = k; }
-  });
-  return best;
-}
-
-// Animasi manual rAF + easing, bukan scroll-behavior:smooth: snap dimatikan selama terbang agar
-// tidak ada koreksi snap di tengah jalan, dan UI hanya di-update sekali di awal (tanpa kedip).
-function animateTo(target, opts = {}) {
-  cancelAnimationFrame(animId);
-  const el = track.children[target];
-  const to = Math.max(slideCenter(el) - track.clientWidth / 2, 0);
-  const jump = () => {
-    track.classList.add('no-snap');
-    track.scrollLeft = to;
-    track.classList.remove('no-snap');
-    if (opts.done) opts.done();
-  };
-  const from = track.scrollLeft;
-  if (opts.instant || reduceMotion || Math.abs(to - from) < 1) { jump(); return; }
-  const dur = Math.min(650, Math.max(340, Math.abs(to - from) * 0.45));
-  const t0 = performance.now();
-  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-  suppress = true;
-  track.classList.add('no-snap');
-  const fly = (now) => {
-    const p = Math.min(1, (now - t0) / dur);
-    track.scrollLeft = from + (to - from) * ease(p);
-    if (p < 1) { animId = requestAnimationFrame(fly); return; }
-    track.classList.remove('no-snap');
-    suppress = false;
-    if (opts.done) opts.done();
-  };
-  animId = requestAnimationFrame(fly);
-}
-
-function snapToReal(i, opts) {
-  update(i);
-  animateTo(trackFromReal(i), opts);
-}
-
-// Kalau posisi istirahat di klon (sisa sentuhan/fling), lompat instan ke slide asli padanannya.
-function normalizePosition() {
-  const k = nearestTrack();
-  if (k !== 0 && k !== n + 1) return realFromTrack(k);
-  const r = realFromTrack(k);
-  track.classList.add('no-snap');
-  track.scrollLeft = Math.max(slideCenter(track.children[trackFromReal(r)]) - track.clientWidth / 2, 0);
-  track.classList.remove('no-snap');
-  return r;
-}
-
-function goReal(i) {
-  if (suppress) return;
-  normalizePosition();
-  snapToReal(((i % n) + n) % n);
-}
-
-// next/prev: melewati klon di ujung lalu melompat instan ke slide asli — tanpa putus, tanpa gulir balik.
-function step(dir) {
-  if (suppress) return;
-  normalizePosition();
-  const next = active + dir;
-  if (next < 0) {
-    update(n - 1);
-    animateTo(0, { done: () => animateTo(trackFromReal(n - 1), { instant: true }) });
-  } else if (next > n - 1) {
-    update(0);
-    animateTo(n + 1, { done: () => animateTo(trackFromReal(0), { instant: true }) });
-  } else {
-    goReal(next);
-  }
-}
-
-let rafPending = false;
-// Gulir sentuh bisa berhenti tepat di klon ujung (hasil snap momentum). Setelah gerakan benar-benar
-// selesai, klon harus dinormalkan ke slide asli padanannya — kalau tidak, swipe berikutnya menabrak
-// ujung fisik track dan galeri terasa macet di HP.
-let settleTimer = null;
-let touchActive = false;
-function armSettle() {
-  clearTimeout(settleTimer);
-  settleTimer = setTimeout(() => {
-    if (suppress || touchActive || dragging) return;
-    normalizePosition();
-  }, 140);
-}
-track.addEventListener('scroll', () => {
-  armSettle();
-  if (suppress || rafPending) return;
-  rafPending = true;
-  requestAnimationFrame(() => {
-    rafPending = false;
-    if (suppress) return;
-    const real = realFromTrack(nearestTrack());
-    if (real !== active) update(real);
-  });
-}, { passive: true });
-
-// Sentuhan saat animasi berjalan membatalkannya supaya geser manual tidak berkelahi dengan rAF.
-track.addEventListener('touchstart', () => {
-  touchActive = true;
-  clearTimeout(settleTimer);
-  if (suppress) {
-    cancelAnimationFrame(animId);
-    suppress = false;
-    track.classList.remove('no-snap');
-  }
-}, { passive: true });
-const touchDone = () => { touchActive = false; armSettle(); };
-track.addEventListener('touchend', touchDone, { passive: true });
-track.addEventListener('touchcancel', touchDone, { passive: true });
-
-document.getElementById('gal-prev').addEventListener('click', () => step(-1));
-document.getElementById('gal-next').addEventListener('click', () => step(1));
-
-gal.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
-  if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
-});
-
-// Drag mouse di desktop; sentuh memakai scroll-snap native, dan istirahat di klon dirapikan armSettle.
-let dragging = false, dragStartX = 0, dragStartLeft = 0;
-track.addEventListener('pointerdown', (e) => {
-  if (e.pointerType !== 'mouse') return;
-  dragging = true;
-  dragStartX = e.clientX;
-  dragStartLeft = track.scrollLeft;
-  track.classList.add('dragging');
-  track.setPointerCapture(e.pointerId);
-});
-track.addEventListener('pointermove', (e) => {
-  if (!dragging) return;
-  track.scrollLeft = dragStartLeft - (e.clientX - dragStartX);
-});
-function endDrag() {
-  if (!dragging) return;
-  dragging = false;
-  const k = nearestTrack();
-  // Lepas 'dragging' sambil langsung pasang 'no-snap': snap mandatory tidak boleh mengoreksi
-  // posisi sebelum animasi selembarkan berjalan, kalau tidak lompatannya terlihat.
-  track.classList.remove('dragging');
-  track.classList.add('no-snap');
-  // Lepas di zona klon: selembarkan dulu klon ke tengah, baru lompat instan ke slide asli —
-  // lompatan langsung dari posisi sembarangan akan terlihat karena klon belum persis di tengah.
-  if (k === 0) {
-    update(n - 1);
-    animateTo(0, { done: () => animateTo(trackFromReal(n - 1), { instant: true }) });
-  } else if (k === n + 1) {
-    update(0);
-    animateTo(n + 1, { done: () => animateTo(trackFromReal(0), { instant: true }) });
-  } else {
-    goReal(realFromTrack(k));
-  }
-}
-track.addEventListener('pointerup', endDrag);
-track.addEventListener('pointercancel', endDrag);
-
-// Isi tiap sel odometer dengan strip vertikal 0-9 di balik jendela setinggi satu angka:
-// pemakainya cukup menggeser strip dan CSS yang menggulirkannya. Angka statis di HTML tetap
-// jadi tampilan fallback sebelum JS jalan. Satu builder untuk semua instance (galeri + wizard).
-function buildOdoStrips(cells) {
-  return [...cells].map((cell) => {
-    const win = document.createElement('span');
-    win.className = 'odo-win';
-    const strip = document.createElement('span');
-    strip.className = 'odo-strip';
-    for (let d = 0; d <= 9; d++) {
-      const digit = document.createElement('span');
-      digit.textContent = String(d);
-      strip.appendChild(digit);
-    }
-    win.appendChild(strip);
-    cell.textContent = '';
-    cell.appendChild(win);
-    return strip;
-  });
-}
-function rollOdo(strips, num) {
-  strips.forEach((strip, k) => { strip.style.transform = 'translateY(' + (-Number(num[k])) + 'em)'; });
-}
-const odoStrips = buildOdoStrips(document.querySelectorAll('.gal-counter [data-odo]'));
-const wizStrips = buildOdoStrips(document.querySelectorAll('.wiz-counter [data-odo]'));
-
-// Posisi awal: slide asli pertama di tengah (child 0 adalah klon slide terakhir).
-update(0);
-track.scrollLeft = Math.max(slideCenter(track.children[1]) - track.clientWidth / 2, 0);
-
-// Wizard cara mulai: satu langkah tampil pada satu waktu; pindah langkah mem-fade panel dan
-// screenshot sambil odometer menggulir nomornya. Di langkah terakhir, Lanjut diganti CTA unduh
-// supaya wizard bermuara ke satu tindakan, bukan berhenti di ujung mati.
-const wizRoot = document.getElementById('wiz');
-const wizPrev = document.getElementById('wiz-prev');
-const wizNext = document.getElementById('wiz-next');
-const wizCta = document.getElementById('wiz-cta');
-const wizPanels = [...document.querySelectorAll('.wiz-panel')];
-const wizShots = [...document.querySelectorAll('.wiz-shot')];
-const wizSlider = document.getElementById('wiz-slider');
-const wizSlides = [...document.querySelectorAll('.wiz-slide')];
-const wizDots = document.getElementById('wiz-dots');
-const wizDotBtns = [...document.querySelectorAll('.wiz-dot')];
-let wizI = 0;
-function wizUpdate() {
-  wizPanels.forEach((p, k) => p.classList.toggle('is-on', k === wizI));
-  wizShots.forEach((s, k) => {
-    s.classList.toggle('is-on', k === wizI);
-    s.setAttribute('aria-hidden', k === wizI ? 'false' : 'true');
-  });
-  // Titik penanda hanya relevan selama langkah dua tampil, dan slidernya cuma boleh di-tab
-  // saat benar-benar tampil.
-  wizDots.hidden = wizI !== 1;
-  wizSlider.tabIndex = wizI === 1 ? 0 : -1;
-  rollOdo(wizStrips, String(wizI + 1).padStart(2, '0'));
-  wizPrev.hidden = wizI === 0;
-  const last = wizI === wizPanels.length - 1;
-  wizNext.hidden = last;
-  wizCta.hidden = !last;
-}
-function wizGo(next) {
-  const to = Math.max(0, Math.min(wizPanels.length - 1, next));
-  if (to !== wizI) { wizI = to; wizUpdate(); }
-}
-wizPrev.addEventListener('click', () => wizGo(wizI - 1));
-wizNext.addEventListener('click', () => wizGo(wizI + 1));
-
-// Slider langkah dua: tiga langkah formulir digeser mendatar, titik penanda mengikuti posisi.
-// Indeks dihitung dari geometri slide, bukan scrollLeft/clientWidth, karena track memakai padding
-// pengintip: tetangga di tepi harus terlihat supaya jelas masih ada gambar lain.
-function wizSlideCenter(el) {
-  const tr = wizSlider.getBoundingClientRect();
-  const er = el.getBoundingClientRect();
-  return er.left + er.width / 2 - tr.left + wizSlider.scrollLeft;
-}
-function wizSlideIndex() {
-  const center = wizSlider.scrollLeft + wizSlider.clientWidth / 2;
-  let best = 0, bd = Infinity;
-  wizSlides.forEach((el, k) => {
-    const d = Math.abs(wizSlideCenter(el) - center);
-    if (d < bd) { bd = d; best = k; }
-  });
-  return best;
-}
-function wizSlideTo(k) {
-  const to = Math.max(0, Math.min(wizSlides.length - 1, k));
-  const el = wizSlides[to];
-  wizSlider.scrollTo({
-    left: Math.max(wizSlideCenter(el) - wizSlider.clientWidth / 2, 0),
-    behavior: reduceMotion ? 'auto' : 'smooth',
-  });
-}
-function wizSlideUpdate() {
-  const k = wizSlideIndex();
-  wizSlides.forEach((s, i) => s.classList.toggle('is-active', i === k));
-  wizDotBtns.forEach((d, i) => d.setAttribute('aria-current', String(i === k)));
-}
-wizSlider.addEventListener('scroll', wizSlideUpdate, { passive: true });
-wizDotBtns.forEach((d, k) => d.addEventListener('click', () => wizSlideTo(k)));
-
-// Drag mouse di desktop; di layar sentuh scroll-snap native sudah cukup.
-let wizDragging = false, wizDragX = 0, wizDragLeft = 0;
-wizSlider.addEventListener('pointerdown', (e) => {
-  if (e.pointerType !== 'mouse') return;
-  wizDragging = true;
-  wizDragX = e.clientX;
-  wizDragLeft = wizSlider.scrollLeft;
-  wizSlider.classList.add('dragging');
-  wizSlider.setPointerCapture(e.pointerId);
-});
-wizSlider.addEventListener('pointermove', (e) => {
-  if (!wizDragging) return;
-  wizSlider.scrollLeft = wizDragLeft - (e.clientX - wizDragX);
-});
-function wizEndDrag() {
-  if (!wizDragging) return;
-  wizDragging = false;
-  wizSlider.classList.remove('dragging');
-  wizSlideTo(wizSlideIndex());
-}
-wizSlider.addEventListener('pointerup', wizEndDrag);
-wizSlider.addEventListener('pointercancel', wizEndDrag);
-wizSlider.addEventListener('keydown', (e) => {
-  // Panah ditahan di slider selama fokus ada di sini, kalau tidak #wiz ikut melompatkan langkah.
-  if (e.key === 'ArrowLeft') { e.preventDefault(); e.stopPropagation(); wizSlideTo(wizSlideIndex() - 1); }
-  if (e.key === 'ArrowRight') { e.preventDefault(); e.stopPropagation(); wizSlideTo(wizSlideIndex() + 1); }
-});
-wizRoot.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowLeft') { e.preventDefault(); wizGo(wizI - 1); }
-  if (e.key === 'ArrowRight') { e.preventDefault(); wizGo(wizI + 1); }
-});
-wizUpdate();
-wizSlideUpdate();
-
-// Accordion FAQ
-document.querySelectorAll('.faq-q').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const open = btn.getAttribute('aria-expanded') === 'true';
-    btn.setAttribute('aria-expanded', String(!open));
-    btn.closest('.faq-item').classList.toggle('open', !open);
-  });
-});
-
-// Menu mobile
-const head = document.getElementById('site-head');
-const burger = document.getElementById('burger');
-const menu = document.getElementById('mobile-menu');
-function setMenu(open) {
-  head.classList.toggle('menu-open', open);
-  burger.setAttribute('aria-expanded', String(open));
-  burger.setAttribute('aria-label', open ? 'Tutup menu' : 'Buka menu');
-  burger.querySelector('.ms').textContent = open ? 'close' : 'menu';
-  if (open) { menu.querySelector('a').focus(); } else { burger.focus(); }
-}
-burger.addEventListener('click', () => setMenu(!head.classList.contains('menu-open')));
-menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && head.classList.contains('menu-open')) setMenu(false);
-});
-
-// Scrollspy nav
-const spyLinks = [...document.querySelectorAll('[data-spy]')];
-const spyMap = new Map(spyLinks.map((l) => [l.getAttribute('href').slice(1), l]));
-const spyIO = new IntersectionObserver((entries) => {
-  entries.forEach((en) => {
-    if (!en.isIntersecting) return;
-    spyLinks.forEach((l) => l.classList.remove('active'));
-    const link = spyMap.get(en.target.id);
-    if (link) link.classList.add('active');
-  });
-}, { rootMargin: '-30% 0px -60% 0px' });
-document.querySelectorAll('main section[id]').forEach((s) => spyIO.observe(s));
-
-// Reveal sekali jalan
-if ('IntersectionObserver' in window && !reduceMotion) {
-  const revIO = new IntersectionObserver((entries) => {
-    entries.forEach((en) => {
-      if (!en.isIntersecting) return;
-      en.target.classList.add('in');
-      revIO.unobserve(en.target);
-    });
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach((el) => revIO.observe(el));
-} else {
-  document.querySelectorAll('.reveal').forEach((el) => el.classList.add('in'));
-}
-
-// Overlay onboarding: replika langkah pertama onboarding aplikasi. Tampil di setiap muat halaman;
-// tombol Mulai atau Escape menutupnya dengan slide ke atas dan membeaskan landing.
-const ob = document.getElementById('ob');
-const obLogo = document.getElementById('ob-logo');
-const obStart = document.getElementById('ob-start');
-let obPrevFocus = null;
-function obOpen() {
-  obPrevFocus = document.activeElement;
-  ob.hidden = false;
-  document.body.classList.add('ob-lock');
-  obStart.focus();
-}
-function obClose() {
-  document.body.classList.remove('ob-lock');
-  const finish = () => {
-    ob.hidden = true;
-    ob.classList.remove('ob-out');
-    if (obPrevFocus instanceof HTMLElement && obPrevFocus !== document.body) obPrevFocus.focus();
-    else document.querySelector('.brand').focus();
-  };
-  if (reduceMotion) finish();
-  else { ob.classList.add('ob-out'); setTimeout(finish, 470); }
-}
-if (ob && obLogo && obStart) {
-  obOpen();
-  obLogo.addEventListener('click', () => {
-    obLogo.classList.remove('rev');
-    void obLogo.offsetWidth;
-    obLogo.classList.add('rev');
-  });
-  obStart.addEventListener('click', obClose);
-  ob.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { e.preventDefault(); obClose(); return; }
-    if (e.key !== 'Tab') return;
-    const ring = [obLogo, obStart];
-    const i = ring.indexOf(document.activeElement);
-    if (e.shiftKey && i <= 0) { e.preventDefault(); ring[1].focus(); }
-    else if (!e.shiftKey && i === ring.length - 1) { e.preventDefault(); ring[0].focus(); }
-  });
-}
-</script>
+<script src="app.js"></script>
 </body>
 </html>

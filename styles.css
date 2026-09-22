@@ -1,0 +1,951 @@
+  /* Palet diambil dari token app (lib/core/theme/tokens.dart): biru #005BBF, aksen #C55500. */
+  :root {
+    --bg: #F6F8FB;
+    --surface: #FFFFFF;
+    --ink: #17202B;
+    --ink-2: #55606E;
+    --line: #DCE4F0;
+    --blue: #005BBF;
+    --blue-deep: #0A4E9E;
+    --blue-hover: #004C9E;
+    --blue-tint: #E4EEFB;
+    /* Garis SoftCard di app (AppTokens.cardOutline), lebih lembut dari --line. */
+    --card-line: #DCE9F7;
+    --navy: #0D2B52;
+    --navy-ink: #C9D9EE;
+    --navy-icon: #9CC0EA;
+    --amber: #C55500;
+    --amber-text: #8A3E00;
+    --amber-tint: #FCEADD;
+    --font-display: "Epilogue", system-ui, sans-serif;
+    --font-body: "Sora", system-ui, -apple-system, sans-serif;
+    --slide-w: clamp(240px, 74vw, 300px);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 88px; }
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 1rem;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; display: block; }
+  h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; letter-spacing: -0.01em; }
+  h2 { font-size: clamp(1.45rem, 2.1vw + 0.8rem, 2.05rem); font-weight: 700; }
+  h3 { font-size: 1.2rem; font-weight: 700; }
+  /* Satu ukuran dasar untuk semua layar: 93.75% = 15px. Sebelumnya desktop 16px
+     dan ponsel 15px; desktop diturunkan ke angka ponsel karena teksnya terasa
+     terlalu besar di layar lebar. Ponsel tidak berubah sama sekali.
+     Hampir semua ukuran di berkas ini memakai rem, dan tidak ada padding,
+     margin, gap, atau border-radius yang memakai rem, jadi menurunkan akar
+     hanya mengecilkan teks: tata letak dan target sentuh berbasis px tetap. */
+  html { font-size: 93.75%; }
+  p { color: var(--ink-2); }
+  strong { color: var(--ink); font-weight: 600; }
+  [hidden] { display: none !important; }
+
+  .container { width: min(1120px, 100% - 40px); margin-inline: auto; }
+  @media (min-width: 720px) { .container { width: min(1120px, 100% - 56px); } }
+
+  .ms {
+    font-family: "Material Symbols Outlined";
+    font-weight: normal; font-style: normal;
+    display: inline-block; line-height: 1;
+    font-variation-settings: "FILL" 0, "wght" 400, "opsz" 24;
+    user-select: none;
+  }
+
+  .skip {
+    position: absolute; left: -9999px; top: 12px; z-index: 100;
+    background: var(--blue); color: #fff; padding: 10px 16px; border-radius: 8px;
+  }
+  .skip:focus { left: 12px; }
+
+  :focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
+  .on-dark :focus-visible { outline-color: #fff; }
+
+  /* Elemen identitas: chip bergaya plat kendaraan Indonesia (putih, teks hitam, strip biru). */
+  .plate {
+    display: inline-flex; align-items: stretch; gap: 8px;
+    background: var(--surface); border: 1.5px solid var(--ink); border-radius: 5px;
+    padding: 4px 12px 4px 4px;
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 0.02em; color: var(--ink);
+  }
+  .plate::before { content: ""; width: 7px; border-radius: 2px; background: var(--blue); }
+  .on-dark .plate { background: transparent; border-color: #fff; color: #fff; }
+
+  /* Angka bergaya odometer: sel terpisah dengan garis tengah, angka tabular. JS mengisi tiap
+     sel dengan strip vertikal 0-9 di balik jendela setinggi satu angka, jadi update menggulir
+     seperti odometer sungguhan. Motif identitas produk yang sengaja diulang: penghitung galeri
+     dan penghitung langkah wizard cara-mulai. */
+  .odo { display: inline-flex; background: #14202F; border-radius: 6px; padding: 4px 2px; }
+  .odo-cell {
+    color: #fff; font-weight: 700; font-size: 0.9rem; line-height: 1;
+    padding: 4px 5px; font-variant-numeric: tabular-nums;
+  }
+  .odo-cell + .odo-cell { border-left: 1px solid rgba(255,255,255,0.28); }
+  .odo-win { display: block; height: 1em; overflow: hidden; }
+  .odo-strip { display: block; }
+  .odo-strip > span { display: block; height: 1em; line-height: 1; }
+  @media (prefers-reduced-motion: no-preference) {
+    .odo-strip { transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+  }
+  .odo-rest { color: var(--ink-2); font-weight: 600; font-size: 0.9rem; align-self: center; margin-left: 8px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 48px; padding: 12px 22px; border-radius: 12px;
+    font: 600 1rem var(--font-body); text-decoration: none; cursor: pointer;
+    border: 1.5px solid transparent;
+  }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-primary:hover { background: var(--blue-hover); }
+  .btn-ghost { background: var(--surface); color: var(--blue-deep); border-color: var(--blue); }
+  .btn-ghost:hover { background: var(--blue-tint); }
+  /* Umpan balik tekan: tombol tenggelam 1px saat aktif, konfirmasi sentuhan yang murah tapi terasa. */
+  @media (prefers-reduced-motion: no-preference) {
+    .btn { transition: transform 0.15s ease; }
+    .btn:active { transform: translateY(1px); }
+  }
+  .btn-lg { min-height: 56px; padding: 16px 30px; font-size: 1.05rem; border-radius: 14px; }
+
+  /* Marka jalan: garis putus pemisah section, satu-satunya ornamen garis. */
+  .road { border: 0; border-top: 3px dashed #C7D6EA; }
+
+  /* Frame HP gaya Android. Bayangan hanya untuk foto utama (hero) dan slide aktif galeri. */
+  .phone {
+    background: #101821; border-radius: 46px; padding: 11px;
+    width: 100%; max-width: 340px;
+  }
+  .phone-sm { max-width: 300px; }
+  .phone-screen { border-radius: 36px; overflow: hidden; position: relative; background: #fff; }
+  .phone-screen img { width: 100%; height: auto; user-select: none; -webkit-user-drag: none; }
+  .punch {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    width: 12px; height: 12px; border-radius: 50%; background: #101821;
+  }
+
+  /* Header */
+  .site-head {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--surface); border-bottom: 1px solid var(--line);
+  }
+  .head-in { display: flex; align-items: center; gap: 20px; height: 66px; }
+  /* Logo di header dan footer sama-sama tautan, jadi tingginya dinaikkan ke
+     target sentuh minimum. Flex-nya sudah center, jadi ikon tetap di tengah. */
+  .brand { display: flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; color: var(--ink); }
+  .brand img { width: 28px; height: 28px; border-radius: 7px; }
+  .brand b { font: 700 1.2rem var(--font-display); letter-spacing: -0.01em; }
+
+  /* Lencana status di samping merek. Titiknya menandai keadaan yang benar
+     (uji coba tertutup masih berjalan) dan tidak berdenyut: tidak ada yang
+     berubah di halaman ini, jadi denyut hanya akan jadi hiasan. */
+  .head-badge {
+    display: none; align-items: center; gap: 7px;
+    padding: 5px 12px 5px 10px; border-radius: 999px;
+    background: var(--blue-tint); color: var(--blue-deep);
+    font-size: 0.8rem; font-weight: 600; white-space: nowrap;
+  }
+  .head-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
+
+  /* Navigasi ditengahkan: margin auto di kedua sisi, jadi jaraknya dari merek
+     dan dari tombol mengikuti lebar layar, bukan nilai tetap. */
+  .nav-links { display: none; align-items: center; gap: 2px; margin-inline: auto; }
+  .nav-links a {
+    display: inline-flex; align-items: center; min-height: 44px; padding: 8px 16px;
+    color: var(--ink-2); text-decoration: none; font-weight: 500; font-size: 0.95rem;
+    border-radius: 10px;
+  }
+  .nav-links a:hover { color: var(--ink); background: var(--bg); }
+  /* Tautan aktif dapat pil latar, bukan garis bawah: satu penanda saja, dan
+     pilnya sekaligus jadi target sentuh yang terlihat. */
+  .nav-links a.active { color: var(--blue-deep); background: var(--blue-tint); font-weight: 600; }
+
+  /* CTA navbar lebih ramping dari .btn dasar; 44px menjaga target sentuh minimum. */
+  .head-cta {
+    display: none; gap: 7px; min-height: 44px; padding: 8px 16px;
+    font-size: 0.84rem; font-weight: 600; border-radius: 10px;
+  }
+  .head-cta .ms { font-size: 1rem; }
+
+  /* Halaman tanpa navigasi (privacy, terms): CTA berdiri langsung setelah merek,
+     jadi ia sendiri yang mendorong ke tepi kanan. Di index aturan ini tidak kena,
+     karena di sana CTA didahului .nav-links, dan navigasi itulah yang memakai
+     margin auto untuk menengahkan diri. */
+  .brand + .head-cta { display: inline-flex; margin-left: auto; }
+
+  .burger {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; margin-left: auto;
+    background: none; border: 1.5px solid var(--line); border-radius: 10px;
+    color: var(--ink); cursor: pointer;
+  }
+  /* Ponsel: lencana ikut tampil di samping merek, jadi status uji coba tetap
+     terbaca sebelum tombol menu dibuka. */
+  @media (min-width: 560px) {
+    .head-badge { display: inline-flex; }
+  }
+  @media (min-width: 880px) {
+    .nav-links { display: flex; }
+    .head-cta { display: inline-flex; }
+    .burger { display: none; }
+  }
+  .mobile-menu { display: none; border-top: 1px solid var(--line); background: var(--surface); padding: 10px 0 14px; }
+  .menu-open .mobile-menu { display: block; }
+  .mobile-menu a {
+    display: flex; align-items: center; min-height: 48px; padding: 10px 4px;
+    color: var(--ink); text-decoration: none; font-weight: 500;
+    border-bottom: 1px solid var(--bg);
+  }
+  .mobile-menu a:last-child { border-bottom: 0; }
+
+  /* Hero */
+  .hero { padding-block: clamp(48px, 8vw, 96px) clamp(40px, 6vw, 72px); }
+  .hero-grid { display: grid; gap: 44px; align-items: center; }
+  @media (min-width: 880px) { .hero-grid { grid-template-columns: 1.05fr 0.95fr; gap: 56px; } }
+  .hero h1 {
+    font-size: clamp(1.85rem, 3.5vw + 0.85rem, 2.95rem);
+    font-weight: 800; margin: 14px 0 18px;
+  }
+  .hero h1 span { color: var(--blue); }
+  .hero-sub { font-size: 1.08rem; max-width: 46ch; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+  /* Tombol utama hero: ikon di kiri, label, panah di kanan. Panah hanya dipakai
+     di satu tombol ini, bukan di semua CTA, karena satu-satunya yang perlu
+     petunjuk arah: ia menggulir halaman ke bagian pendaftaran, bukan membuka
+     halaman baru. */
+  .hero-cta-main {
+    min-height: 52px; padding: 13px 22px; border-radius: 14px;
+    font-size: 0.95rem; font-weight: 700;
+  }
+  .hero-cta-main .ms { font-size: 1.25rem; }
+  /* Tombol sekunder di baris yang sama harus lebih kecil dari yang utama,
+     kalau tidak tindakan utama justru yang terlihat paling kecil. */
+  .hero-cta .btn-ghost { font-size: 0.88rem; min-height: 52px; padding: 13px 18px; }
+  .hero-cta-main .cta-arrow { font-size: 1.25rem; }
+  .hero-facts {
+    display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 22px;
+    color: var(--ink-2); font-size: 0.92rem; font-weight: 500;
+  }
+  .hero-phone { display: flex; justify-content: center; }
+  @media (min-width: 880px) { .hero-phone { justify-content: flex-end; } }
+  .hero .road { margin-top: clamp(40px, 6vw, 72px); }
+
+  /* Section dasar */
+  section { padding-block: clamp(56px, 8vw, 96px); }
+  .sec-head { max-width: 640px; margin-bottom: clamp(28px, 4vw, 44px); }
+  .sec-head h2 { margin: 14px 0 12px; }
+  .sec-head p { font-size: 1.02rem; }
+
+  /* Kenapa */
+  .why-grid { display: grid; gap: 40px; align-items: center; }
+  @media (min-width: 880px) { .why-grid { grid-template-columns: 1.05fr 0.95fr; gap: 56px; } }
+  .pain-list { list-style: none; margin: 18px 0; display: grid; gap: 10px; }
+  .pain-list li { display: flex; gap: 10px; align-items: baseline; color: var(--ink-2); }
+  .pain-list .ms { color: var(--amber); font-size: 20px; transform: translateY(3px); }
+  .why-sol { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 1.02rem; }
+  .why-phone { display: flex; justify-content: center; }
+
+  /* Fitur */
+  .fitur { background: var(--surface); border-block: 1px solid var(--line); }
+  .feat-big {
+    display: grid; gap: 32px; align-items: center;
+    padding: clamp(24px, 3.5vw, 40px);
+    background: var(--bg); border: 1px solid var(--line); border-radius: 20px;
+  }
+  @media (min-width: 880px) { .feat-big { grid-template-columns: 1fr 1fr; gap: 48px; } }
+  .feat-big h3 { font-size: 1.45rem; margin-bottom: 12px; }
+  .feat-big .lead { margin-bottom: 16px; }
+  .tick-list { list-style: none; display: grid; gap: 8px; }
+  .tick-list li { display: flex; gap: 10px; align-items: baseline; color: var(--ink-2); }
+  .tick-list .ms { color: var(--blue); font-size: 20px; transform: translateY(3px); }
+
+  /* Mock notifikasi Android: menampilkan perilaku yang tak tampak di screenshot statis. */
+  .notif-stack { display: grid; gap: 12px; }
+  .notif-label { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.02em; color: var(--ink-2); }
+  .notif {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+    padding: 14px 16px; box-shadow: 0 8px 20px -14px rgba(13, 43, 82, 0.35);
+  }
+  .notif-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .notif-head img { width: 18px; height: 18px; border-radius: 4px; }
+  .notif-app { font-size: 0.78rem; font-weight: 600; color: var(--ink); }
+  .notif-title { font-weight: 600; color: var(--ink); font-size: 0.95rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .notif-body { font-size: 0.88rem; margin-top: 2px; }
+  .chip-segera {
+    background: var(--amber-tint); color: var(--amber-text);
+    font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 5px;
+  }
+
+  /* Mock SoftCard: treatment kartu aplikasi apa adanya (putih, garis biru muda,
+     tanpa bayangan) supaya baris yang dijelaskan di sini terbaca sama dengan
+     yang nanti ditemui di halaman detail servis. */
+  .soft-stack { display: grid; gap: 12px; }
+  .soft-card {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--surface); border: 1px solid var(--card-line); border-radius: 16px;
+    padding: 16px;
+  }
+  .soft-card > .ms { color: var(--blue); font-size: 22px; flex: 0 0 auto; }
+  .soft-card-body { min-width: 0; flex: 1; }
+  .soft-card-title { font-weight: 700; color: var(--ink); font-size: 0.95rem; }
+  .soft-card-sub { font-size: 0.86rem; margin-top: 2px; }
+  /* Deskripsi record induk dipotong satu baris, persis seperti di app: dua servis
+     dibedakan sekilas, dan barisnya tidak ikut menaikkan tinggi kartu. */
+  .soft-card-sub.clip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .soft-card-go { color: var(--ink-2); font-size: 20px; flex: 0 0 auto; }
+
+  .feat-rest { display: grid; gap: 20px; margin-top: 20px; }
+  @media (min-width: 640px) { .feat-rest { grid-template-columns: 1fr 1fr; } }
+  .feat-row {
+    display: flex; gap: 16px; padding: 22px;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 16px;
+  }
+  .feat-icon {
+    flex: 0 0 44px; width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--blue-tint); color: var(--blue-deep);
+  }
+  .feat-row h3 { font-size: 1.02rem; margin-bottom: 4px; }
+  .feat-row p { font-size: 0.92rem; }
+  .feat-wide { padding: 22px; background: var(--bg); border: 1px solid var(--line); border-radius: 16px; }
+  @media (min-width: 880px) {
+    .feat-wide { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 28px; align-items: center; padding: 28px; }
+  }
+  .feat-wide .feat-icon { margin-bottom: 14px; }
+  .feat-wide h3 { font-size: 1.2rem; margin-bottom: 6px; }
+  .feat-wide p { max-width: 52ch; }
+  .feat-shot { border: 1px solid var(--line); border-radius: 18px; overflow: hidden; max-width: 280px; margin: 18px auto 0; }
+  @media (min-width: 880px) { .feat-shot { margin: 0; justify-self: end; } }
+  .feat-shot img { width: 100%; height: auto; }
+
+  /* Galeri tampilan */
+  .gal-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; max-width: none; }
+  .gal-head > div { max-width: 560px; }
+  .gal-counter { display: inline-flex; align-items: center; }
+  .gal {
+    outline-offset: 4px;
+    /* Di bawah ~340px padding track (50% - setengah lebar slide) melebihi lebar
+       container, dan sisanya meluber ke kanan sebagai gulir halaman. Track-nya
+       sendiri sudah overflow-x:auto, jadi memotong di sini tidak menghilangkan
+       apa pun: slide tetap bisa digeser. */
+    overflow-x: hidden;
+  }
+  .gal-track { display: flex; gap: 20px;
+    overflow-x: auto; scroll-snap-type: x mandatory;
+    padding: 12px calc(50% - var(--slide-w) / 2) 28px;
+    scrollbar-width: none; cursor: grab;
+  }
+  .gal-track::-webkit-scrollbar { display: none; }
+  .gal-track.dragging { cursor: grabbing; }
+  .gal-track.dragging .gal-slide { pointer-events: none; }
+  /* Snap dimatikan selama drag dan animasi programatik supaya tidak berkelahi dengan scrollLeft. */
+  .gal-track.dragging, .gal-track.no-snap { scroll-snap-type: none; }
+  .gal-slide {
+    flex: 0 0 auto; width: var(--slide-w); scroll-snap-align: center;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .gal-slide .phone { max-width: none; }
+  .gal-slide:not(.is-active) { opacity: 0.5; transform: scale(0.96); }
+  .gal-slide.is-active .phone { box-shadow: 0 24px 48px -20px rgba(13, 43, 82, 0.35); }
+  @media (prefers-reduced-motion: no-preference) {
+    .gal-slide { transition: opacity 0.25s ease, transform 0.25s ease; }
+  }
+  .gal-caption {
+    min-height: 3em; text-align: center; max-width: 52ch; margin-inline: auto;
+    font-size: 0.98rem;
+  }
+  /* Caption berganti dengan crossfade kecil tiap pindah slide, bukan bertukar mentah. */
+  @media (prefers-reduced-motion: no-preference) {
+    .gal-caption.swap { animation: cap-in 0.35s ease; }
+    @keyframes cap-in { from { opacity: 0; transform: translateY(4px); } }
+  }
+  .gal-nav { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 8px; }
+  .gal-arrow {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--surface); border: 1.5px solid var(--blue); color: var(--blue-deep); cursor: pointer;
+  }
+  .gal-arrow:hover { background: var(--blue-tint); }
+  .gal-dot {
+    width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
+    background: none; border: 0; cursor: pointer; padding: 0;
+  }
+  .gal-dot::after {
+    content: ""; width: 9px; height: 9px; border-radius: 999px;
+    background: #6E8098; transition: width 0.2s ease, background 0.2s ease;
+  }
+  .gal-dot[aria-current="true"]::after { width: 24px; background: var(--blue); }
+  .gal-static { display: grid; gap: 24px; }
+  @media (min-width: 640px) { .gal-static { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); } }
+  .gal-static figcaption { font-size: 0.85rem; color: var(--ink-2); margin-top: 8px; }
+
+  /* Wizard cara mulai: band putih menandai zona interaktif di antara dua section abu-abu.
+     Dengan JS, panel dan screenshot ditumpuk di satu sel grid sehingga tinggi stabil dan
+     pergantian langkah jadi crossfade; tanpa JS ketiga langkah tampil berurutan biasa. */
+  .wizard { background: var(--surface); border-block: 1px solid var(--line); }
+  .wiz-grid { display: grid; gap: 44px; align-items: center; }
+  @media (min-width: 880px) { .wiz-grid { grid-template-columns: 1.05fr 0.95fr; gap: 56px; } }
+  .wiz { margin-top: 22px; }
+  .wiz-counter { display: none; align-items: center; margin-bottom: 18px; }
+  html.js .wiz-counter { display: flex; }
+  .wiz-panel h3 { font-size: 1.45rem; margin-bottom: 10px; }
+  .wiz-panel p { max-width: 46ch; }
+  html.js .wiz-panels, html.js .wiz-shots { display: grid; }
+  html.js .wiz-shots { width: 100%; }
+  html.js .wiz-panel { grid-area: 1 / 1; opacity: 0; visibility: hidden; }
+  html.js .wiz-panel.is-on { opacity: 1; visibility: visible; }
+  html.js .wiz-shot { grid-area: 1 / 1; opacity: 0; }
+  html.js .wiz-shot.is-on { opacity: 1; }
+  /* Gambar yang sedang tidak tampil tidak boleh menerima sentuhan, kalau tidak slider langkah dua
+     diam-diam menyerap geseran saat langkah lain yang aktif. */
+  html.js .wiz-shot { pointer-events: none; }
+  html.js .wiz-shot.is-on { pointer-events: auto; }
+  /* Pergantian langkah: panel baru naik-fade seperti caption galeri, panel lama memudar.
+     Transisi interaksi, sesuai dial MOTION halaman. */
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .wiz-panel { transition: opacity 0.3s ease, visibility 0s 0.3s; }
+    html.js .wiz-panel.is-on { transition-delay: 0s; animation: cap-in 0.35s ease; }
+    html.js .wiz-shot { transition: opacity 0.35s ease; }
+  }
+  .wiz-nav { display: none; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+  html.js .wiz-nav { display: flex; }
+  .wiz-phone { --wiz-slide-w: var(--slide-w); display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  @media (min-width: 880px) { .wiz-phone { --wiz-slide-w: 300px; } }
+  /* Langkah dua memuat dua contoh catatan (BBM dan servis). Tiap gambar dibungkus frame ponsel
+     sendiri dan frame itu ikut bergeser, sama seperti carousel Tampilan: tetangga mengintip di
+     tepi dan yang tidak aktif meredup, jadi jelas masih ada gambar lain di sebelahnya.
+     Titik penanda duduk di atas frame supaya terlihat sebelum digulir. */
+  html.js .wiz-shot { display: grid; justify-items: center; }
+  html.js .wiz-shot .phone { width: var(--wiz-slide-w); max-width: none; }
+  html.js .wiz-slider {
+    display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory;
+    width: 100%; padding-block: 10px 14px;
+    padding-inline: calc((100% - var(--wiz-slide-w)) / 2);
+    scrollbar-width: none; cursor: grab;
+  }
+  /* Di layar sempit track melebar sampai tepi container supaya slide sebelahnya benar-benar
+     mengintip — itulah petunjuk bahwa masih ada gambar lain untuk digeser. Padding ikut
+     menghitung tambahan 40px itu supaya slide tetap pas di tengah. */
+  @media (max-width: 879.98px) {
+    html.js .wiz-slider {
+      width: calc(100% + 40px); margin-inline: -20px;
+      padding-inline: calc((100% + 40px - var(--wiz-slide-w)) / 2);
+    }
+  }
+  html.js .wiz-slider::-webkit-scrollbar { display: none; }
+  html.js .wiz-slider.dragging { cursor: grabbing; scroll-snap-type: none; }
+  html.js .wiz-slider.dragging .wiz-slide { pointer-events: none; }
+  html.js .wiz-slide { flex: 0 0 auto; width: var(--wiz-slide-w); scroll-snap-align: center; }
+  .wiz-slide:not(.is-active) { opacity: 0.5; transform: scale(0.96); }
+  .wiz-slide.is-active .phone { box-shadow: 0 24px 48px -20px rgba(13, 43, 82, 0.35); }
+  @media (prefers-reduced-motion: no-preference) {
+    .wiz-slide { transition: opacity 0.25s ease, transform 0.25s ease; }
+  }
+  .wiz-dots { width: 100%; max-width: var(--wiz-slide-w); justify-content: center; gap: 2px; }
+  html.js .wiz-dots { display: flex; }
+  .wiz-dot {
+    width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
+    background: none; border: 0; padding: 0; cursor: pointer;
+  }
+  .wiz-dot::after {
+    content: ""; width: 9px; height: 9px; border-radius: 999px;
+    background: #6E8098; transition: width 0.2s ease, background 0.2s ease;
+  }
+  .wiz-dot[aria-current="true"]::after { width: 24px; background: var(--blue); }
+
+  /* Overlay onboarding: replika langkah pertama onboarding aplikasi (lib/features/onboarding),
+     teks, warna, dan perilakunya disamakan: logo mobil yang bisa diketuk (getar + gelombang
+     mesin menyala) dan tombol Mulai. Tampil di setiap muat halaman, dibuka lewat JS supaya
+     tanpa JS landing tetap utuh. */
+  .ob {
+    position: fixed; inset: 0; z-index: 200;
+    background: var(--surface);
+    display: flex; flex-direction: column;
+  }
+  body.ob-lock { overflow: hidden; }
+  .ob-body {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 16px 24px; max-width: 30rem; margin-inline: auto; width: 100%;
+  }
+  .ob-title { font-size: clamp(1.7rem, 5vw, 2.1rem); font-weight: 800; }
+  .ob-sub { margin-top: 10px; font-size: 0.98rem; max-width: 34ch; }
+  .ob-logo {
+    position: relative; width: 234px; height: 234px; margin-top: 34px;
+    background: none; border: 0; padding: 0; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ob-core {
+    position: absolute; inset: 0; margin: auto;
+    width: 130px; height: 130px; border-radius: 50%;
+    background: #fff; box-shadow: 0 18px 36px -16px rgba(13, 43, 82, 0.45);
+  }
+  .ob-core::after {
+    content: ""; position: absolute; inset: 8px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--blue-deep));
+  }
+  .ob-car {
+    position: absolute; inset: 0; z-index: 1; margin: auto;
+    width: 58px; height: 58px; line-height: 58px; text-align: center;
+    color: #fff; font-size: 58px;
+    font-variation-settings: "FILL" 1, "wght" 400, "opsz" 48;
+  }
+  .ob-bubble {
+    position: absolute; width: 40px; height: 40px; border-radius: 50%;
+    background: #fff; box-shadow: 0 8px 20px -14px rgba(13, 43, 82, 0.35);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--blue);
+  }
+  .ob-bubble .ms { font-size: 18px; font-variation-settings: "FILL" 1, "wght" 400, "opsz" 24; }
+  .ob-bubble.b0 { right: 25px; bottom: 25px; }
+  .ob-bubble.b1 { left: 25px; bottom: 25px; }
+  .ob-bubble.b2 { right: 25px; top: 25px; }
+  .ob-bubble.b3 { left: 25px; top: 25px; }
+  .ob-wave {
+    position: absolute; inset: 0; margin: auto; width: 156px; height: 156px;
+    border-radius: 50%; border: 2px solid rgba(0, 91, 191, 0.3);
+    opacity: 0; pointer-events: none;
+  }
+  .ob-wave.w2 { border-color: rgba(0, 91, 191, 0.2); }
+  .ob-wave.w3 { border-color: rgba(0, 91, 191, 0.1); }
+  .ob-hint {
+    margin-top: 26px; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.3px;
+    color: rgba(0, 91, 191, 0.8);
+  }
+  .ob-start {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    margin-top: 34px;
+    min-height: 48px; padding: 12px 26px; border: 0; border-radius: 999px;
+    background: var(--blue); color: #fff;
+    font: 600 1rem var(--font-body); cursor: pointer;
+  }
+  .ob-start:hover { background: var(--blue-hover); }
+  .ob-start .ms { font-size: 15px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .ob { transition: transform 0.45s ease-in; animation: ob-fade 0.25s ease; }
+    /* Keluar: menggeser seluruh overlay ke atas sampai tuntas, menyerahkan panggung ke landing. */
+    .ob.ob-out { transform: translateY(-100%); }
+    @keyframes ob-fade { from { opacity: 0; } }
+    /* Masuk seperti aplikasi: teks reveal, logo memantul elastic, gelembung fitur
+       bergiliran diagonal. Semuanya sekali jalan. */
+    .ob-title, .ob-sub, .ob-hint { animation: cap-in 0.5s ease backwards; }
+    .ob-sub { animation-delay: 0.1s; }
+    .ob-hint { animation-delay: 0.45s; }
+    .ob-core { animation: ob-core-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+    .ob-bubble { animation: ob-bubble-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+    .ob-bubble.b0 { animation-delay: 0.3s; --fx: -30px; --fy: -30px; }
+    .ob-bubble.b1 { animation-delay: 0.45s; --fx: 30px; --fy: -30px; }
+    .ob-bubble.b2 { animation-delay: 0.6s; --fx: -30px; --fy: 30px; }
+    .ob-bubble.b3 { animation-delay: 0.75s; --fx: 30px; --fy: 30px; }
+    /* Ketukan: getar mesin + pop skala, lalu tiga gelombang memuai dan memudar.
+       Keempat pilar berdenyut berurutan setiap rev — gema dari stagger diagonal masuknya. */
+    .ob-logo.rev .ob-core { animation: ob-shake 0.4s ease-in-out, ob-pop 0.3s ease; }
+    .ob-logo.rev .ob-wave { animation: ob-wave-out 0.6s ease-out forwards; }
+    .ob-logo.rev .ob-wave.w2 { animation-duration: 0.8s; }
+    .ob-logo.rev .ob-wave.w3 { animation-duration: 1s; }
+    .ob-logo.rev .ob-bubble { animation: ob-bubble-pop 0.5s ease; }
+    .ob-logo.rev .ob-bubble.b1 { animation-delay: 0.08s; }
+    .ob-logo.rev .ob-bubble.b2 { animation-delay: 0.16s; }
+    .ob-logo.rev .ob-bubble.b3 { animation-delay: 0.24s; }
+    .ob-start:active { transform: translateY(1px); }
+  }
+  @keyframes ob-core-in { from { transform: scale(0.3); } }
+  @keyframes ob-bubble-in { from { opacity: 0; transform: translate(var(--fx, 0), var(--fy, 0)); } }
+  @keyframes ob-bubble-pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.28); }
+    100% { transform: scale(1); }
+  }
+  @keyframes ob-shake {
+    0%, 100% { transform: translateX(0) rotate(0); }
+    10% { transform: translateX(-3px) rotate(-2deg); }
+    20% { transform: translateX(3px) rotate(2deg); }
+    30% { transform: translateX(-3px) rotate(-1.5deg); }
+    45% { transform: translateX(3px) rotate(1.5deg); }
+    60% { transform: translateX(-2px) rotate(-1deg); }
+    80% { transform: translateX(2px) rotate(0.5deg); }
+  }
+  @keyframes ob-pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.12); }
+    100% { transform: scale(1); }
+  }
+  @keyframes ob-wave-out {
+    from { opacity: 0.9; transform: scale(0.8); }
+    to { opacity: 0; transform: scale(1.3); }
+  }
+
+  /* Privasi: satu-satunya band gelap, diberi ke pembeda terkuat produk agar hierarki terasa. */
+  .privasi { background: var(--navy); }
+  .privasi .sec-head { max-width: 720px; }
+  .privasi h2 { color: #fff; }
+  .privasi-lead { color: var(--navy-ink); font-size: 1.05rem; max-width: 58ch; }
+  .fact-grid { display: grid; gap: 24px; margin-top: 36px; }
+  @media (min-width: 720px) { .fact-grid { grid-template-columns: repeat(3, 1fr); } }
+  .fact .feat-icon { background: rgba(255, 255, 255, 0.1); color: var(--navy-icon); }
+  .fact h3 { color: #fff; font-size: 1.02rem; margin: 12px 0 4px; }
+  .fact p { color: var(--navy-ink); font-size: 0.92rem; }
+  .privasi-backup {
+    display: flex; gap: 14px; align-items: flex-start;
+    margin-top: 36px; padding-top: 28px; border-top: 1px solid rgba(255, 255, 255, 0.16);
+    max-width: 720px;
+  }
+  .privasi-backup .feat-icon { background: rgba(255, 255, 255, 0.1); color: var(--navy-icon); }
+  .privasi-backup p { color: var(--navy-ink); }
+  .privasi-backup code {
+    font-family: ui-monospace, "Cascadia Mono", monospace; font-size: 0.9em;
+    background: rgba(255, 255, 255, 0.1); color: #fff; padding: 1px 7px; border-radius: 5px;
+  }
+
+  /* FAQ */
+  .faq-wrap { max-width: 760px; }
+  .faq-item { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 12px; }
+  .faq-q {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    width: 100%; min-height: 44px; padding: 16px 18px;
+    background: none; border: 0; cursor: pointer;
+    font: 600 1rem var(--font-body); color: var(--ink); text-align: left;
+  }
+  .faq-q .ms { color: var(--ink-2); transition: transform 0.2s ease; }
+  .faq-item.open .faq-q .ms { transform: rotate(180deg); }
+  .faq-a { display: grid; grid-template-rows: 0fr; }
+  .faq-item.open .faq-a { grid-template-rows: 1fr; }
+  @media (prefers-reduced-motion: no-preference) {
+    .faq-a { transition: grid-template-rows 0.25s ease; }
+    .faq-q .ms { transition: transform 0.2s ease; }
+  }
+  .faq-a-inner { overflow: hidden; }
+  .faq-a-inner p { padding: 0 18px 18px; font-size: 0.95rem; }
+
+  /* CTA akhir */
+  .cta-final { text-align: center; }
+  .cta-final .sec-head { margin-inline: auto; text-align: center; }
+  .cta-note { font-size: 0.88rem; margin-top: 14px; }
+
+  footer { background: var(--surface); border-top: 1px solid var(--line); padding: clamp(40px, 5vw, 56px) 0 0; }
+  /* Tiga kolom: blok merek yang lebar, lalu dua kolom tautan. Grid, bukan flex,
+     supaya kedua kolom tautan rata di garis yang sama berapa pun panjang teks
+     di kolom merek. */
+  .foot-grid { display: grid; gap: clamp(28px, 4vw, 40px); }
+  @media (min-width: 760px) {
+    .foot-grid { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr); }
+  }
+  .foot-brand { display: grid; gap: 14px; justify-items: start; }
+  /* Logo di footer ikut jadi tautan, jadi tingginya dinaikkan ke target sentuh
+     minimum. Flex-nya sudah center, jadi ikon tetap di tengah kotak 44px. */
+  .foot-brand .brand { min-height: 44px; }
+  .foot-brand p { font-size: 0.92rem; max-width: 44ch; }
+  .foot-mail {
+    display: inline-flex; align-items: center; gap: 9px; min-height: 44px;
+    color: var(--blue-deep); font-weight: 600; font-size: 0.92rem; text-decoration: none;
+  }
+  .foot-mail:hover { text-decoration: underline; }
+  .foot-mail .ms { font-size: 1.15rem; }
+  .foot-made { color: var(--ink-2); font-size: 0.85rem; }
+  .foot-made strong { color: var(--ink); font-weight: 600; }
+
+  /* Judul kolom: huruf besar berspasi, dipakai sekali di footer sebagai penanda
+     kelompok tautan. Sengaja tidak dipakai di section lain supaya tetap jadi
+     penanda "ini peta situs", bukan gaya judul yang berulang. */
+  .foot-col h2 {
+    font-family: var(--font-body); font-size: 0.78rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2);
+    margin-bottom: 14px;
+  }
+  .foot-col ul { list-style: none; display: grid; gap: 2px; }
+  .foot-col a {
+    display: inline-flex; align-items: center; min-height: 44px;
+    color: var(--ink-2); font-size: 0.94rem; text-decoration: none;
+  }
+  .foot-col a:hover { color: var(--blue-deep); text-decoration: underline; }
+
+  /* Baris penutup: dipisah garis penuh, hak cipta di kiri, catatan kanal di kanan. */
+  .foot-bar {
+    display: flex; flex-wrap: wrap; gap: 6px 20px; align-items: center;
+    margin-top: clamp(32px, 4vw, 44px); padding: 20px 0 24px;
+    border-top: 1px solid var(--line);
+  }
+  .foot-bar p { font-size: 0.88rem; }
+  .foot-note { margin-left: auto; color: var(--ink-2); }
+  /* Ponsel: catatan kanal turun ke barisnya sendiri, rata kiri, karena
+     margin-left:auto menggantungkannya di tepi kanan begitu baris patah. */
+  @media (max-width: 599px) {
+    .foot-note { margin-left: 0; }
+  }
+
+  /* Reveal: fade + naik kecil, sekali jalan, hanya saat JS aktif dan user tak mematikan motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .reveal { opacity: 0; transform: translateY(14px); }
+    html.js .reveal.in { opacity: 1; transform: none; transition: opacity 0.5s ease, transform 0.5s ease; }
+    /* Hero: anak-anaknya masuk bergiliran (judul → sub → CTA → fakta) supaya urutan fokus
+       pembaca terpandu; mockup HP menyusul belakangan. Tetap sekali jalan, tanpa loop. */
+    html.js .reveal.stagger { opacity: 1; transform: none; transition: none; }
+    html.js .stagger:not(.in) > * { opacity: 0; transform: translateY(14px); }
+    html.js .stagger.in > * { opacity: 1; transform: none; transition: opacity 0.5s ease, transform 0.5s ease; }
+    html.js .stagger.in > *:nth-child(2) { transition-delay: 0.08s; }
+    html.js .stagger.in > *:nth-child(3) { transition-delay: 0.16s; }
+    html.js .stagger.in > *:nth-child(4) { transition-delay: 0.24s; }
+    html.js .hero-phone.in { transition-delay: 0.15s; }
+  }
+
+  /* ===== Halaman legal (privacy.html, terms.html) =====
+     Halaman ini memuat styles.css dan TIDAK memuat app.js: skrip itu menambahkan
+     kelas .js ke <html>, dan `html.js .reveal { opacity: 0 }` akan menyembunyikan
+     seluruh isi halaman yang tak pernah di-reveal. Karena itu kelas .reveal tidak
+     dipakai di sini sama sekali. */
+  .legal-head { padding-block: clamp(32px, 5vw, 56px) 0; }
+  .legal-head h1 { font-size: clamp(1.7rem, 2.6vw + 0.85rem, 2.3rem); font-weight: 700; margin: 14px 0 10px; }
+  .legal-updated { font-size: 0.9rem; color: var(--ink-2); }
+  .legal-wrap { display: grid; gap: 32px; align-items: start; }
+  /* Grid item punya lantai min-content secara bawaan, jadi tabel harga di
+     dalam .legal-body memaksa kolomnya selebar 304px dan sisanya meluber ke
+     kanan di layar sempit. Lantai itu dilepas di sini, dan tabelnya sendiri
+     sudah punya overflow-x: auto sebagai penampung. */
+  .legal-wrap > * { min-width: 0; }
+  @media (min-width: 880px) { .legal-wrap { grid-template-columns: 260px 1fr; gap: 56px; } }
+
+  /* Daftar isi: rel tipis di tepi kiri menandai posisi baca, dan ruas biru di
+     atasnya menunjuk bagian yang sedang terlihat. Relnya satu garis penuh,
+     bukan garis per item, jadi daftarnya terbaca sebagai satu jalur, bukan
+     tumpukan garis. Kotak latarnya dilepas: tanpa bingkai, rel itu sendiri yang
+     jadi batas, dan daftarnya berhenti terlihat seperti kartu di dalam kolom. */
+  .legal-toc { position: relative; }
+  @media (min-width: 880px) {
+    .legal-toc {
+      position: sticky; top: 88px;
+      /* Daftar terpanjang (terms) lebih tinggi dari layar pendek. Dibiarkan
+         menggulir sendiri daripada terpotong tanpa cara menjangkaunya. */
+      max-height: calc(100vh - 108px); overflow-y: auto;
+    }
+  }
+  /* Label huruf besar berspasi lebar: memisahkan "ini apa" dari "isinya apa".
+     Sama dengan perlakuan judul kolom di footer, jadi ini konvensi situs. */
+  .legal-toc h2 {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-2); margin-bottom: 10px;
+  }
+  /* Rel dipasang di <ol>, bukan di <nav>: kalau di <nav>, garisnya ikut naik
+     sampai label di atasnya. */
+  .legal-toc ol {
+    position: relative; padding-left: 20px;
+    list-style: none; display: grid; counter-reset: toc;
+  }
+  .legal-toc ol::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 2px; border-radius: 2px; background: var(--line);
+  }
+  .legal-toc a {
+    position: relative;
+    display: grid; grid-template-columns: auto 1fr; gap: 0 10px;
+    /* Barisnya dipusatkan di dalam tinggi minimumnya, tapi isinya rata baris
+       dasar: nomor tetap sebaris dengan baris pertama teks saat judulnya
+       melipat dua. */
+    align-items: baseline; align-content: center;
+    min-height: 44px; padding: 9px 0;
+    /* Belum dibaca: abu-abu. Kalau semua item biru, warna berhenti menandai
+       apa pun dan yang sedang aktif tidak lagi menonjol. */
+    color: var(--ink-2); text-decoration: none;
+    font-size: 0.92rem; line-height: 1.4;
+  }
+  /* Di ponsel daftar ini disentuh, jadi tingginya tetap 44px. Di layar lebar ia
+     jadi rel samping yang diklik dengan tetikus, dan 44px per baris membuat
+     daftarnya jarang sampai susah dipindai sebagai satu jalur. Di sana
+     barisnya dirapatkan ke 40px, sama dengan jarak baris di acuan desainnya;
+     target kliknya masih jauh di atas batas 24px. */
+  @media (min-width: 880px) {
+    .legal-toc a { min-height: 40px; }
+  }
+  .legal-toc a:hover { color: var(--ink); }
+  /* Lebarnya tetap supaya nomor dua digit tidak menggeser teks di sebelahnya. */
+  .legal-toc a::before {
+    counter-increment: toc; content: counter(toc) ".";
+    width: 1.5em; color: var(--ink-2); font-weight: 600;
+  }
+  /* Bagian yang sedang dibaca: teksnya lebih gelap dan lebih tebal, dan ruas
+     relnya menyala biru. Tiga penanda sekaligus, bukan warna saja, supaya
+     bedanya tetap terbaca tanpa membedakan warna. */
+  .legal-toc a.active { color: var(--ink); font-weight: 700; }
+  .legal-toc a.active::after {
+    content: ''; position: absolute; left: -20px; top: 0; bottom: 0;
+    width: 2px; border-radius: 2px; background: var(--blue);
+  }
+
+  .legal-body { max-width: 720px; }
+  .legal-body section { padding-block: 0; margin-bottom: 36px; }
+  .legal-body h2 { font-size: 1.3rem; margin-bottom: 12px; scroll-margin-top: 96px; }
+  .legal-body h3 { font-size: 1.05rem; margin: 20px 0 8px; }
+  .legal-body p { margin-bottom: 12px; line-height: 1.65; }
+  .legal-body ul, .legal-body ol { margin: 0 0 12px 20px; display: grid; gap: 8px; }
+  .legal-body li { color: var(--ink-2); line-height: 1.6; }
+  .legal-body a { color: var(--blue-deep); }
+  .legal-body strong { color: var(--ink); }
+  /* Tabel ringkas untuk harga: lebih terbaca daripada paragraf berisi angka. */
+  /* Tabel harga: tiga kolom teks yang tidak bisa menyusut di bawah lebar
+     minimumnya. Di layar sempit tabelnya digeser mendatar di dalam bingkainya
+     sendiri, bukan memaksa seluruh halaman ikut meluber. */
+  .legal-table-wrap { overflow-x: auto; margin: 8px 0 16px; }
+  .legal-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+  .legal-table th, .legal-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .legal-table th { color: var(--ink); font-weight: 700; }
+  .legal-table td { color: var(--ink-2); }
+  .legal-note { background: var(--blue-tint); border-radius: 12px; padding: 16px 18px; margin: 16px 0; }
+  .legal-note p { margin: 0; }
+  .legal-back { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--blue-deep); font-weight: 600; text-decoration: none; }
+  .legal-back:hover { text-decoration: underline; }
+
+  /* ===== Section beta (#beta): satu-satunya jalur konversi sekarang =====
+     Setiap kontrol "Early Access" di halaman ini menggulir ke sini.
+     Susunannya mengikuti acuan tiga blok: empat kartu langkah berbingkai, satu
+     kartu hadiah melebar, lalu formulir dan dua kartu bantuan berdampingan. */
+  .beta { background: var(--surface); border-top: 1px solid var(--line); }
+  .beta .sec-head { text-align: center; margin-inline: auto; }
+
+  /* Langkah: kartu berbingkai dengan nomor menggantung di tepi atas dan ikon di
+     tengah. Nomor di tepi itu yang membuat empat kartu terbaca berurutan tanpa
+     perlu garis penghubung. */
+  .beta-steps {
+    list-style: none; display: grid; gap: 20px;
+    margin: clamp(32px, 4.5vw, 48px) 0 0; counter-reset: step;
+  }
+  @media (min-width: 720px) { .beta-steps { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
+  @media (min-width: 1040px) { .beta-steps { grid-template-columns: repeat(4, 1fr); } }
+  .beta-steps li {
+    counter-increment: step; position: relative;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 16px;
+    padding: 30px 22px 24px; text-align: center;
+  }
+  .beta-steps li::before {
+    content: counter(step);
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    display: grid; place-items: center; width: 28px; height: 28px;
+    border-radius: 50%; background: var(--surface); border: 1px solid var(--line);
+    color: var(--ink-2); font-weight: 700; font-size: 0.85rem;
+  }
+  /* Ikon langkah: kotak bersudut lembut, bukan bulat, supaya tidak bersaing
+     dengan nomor bulat di atasnya. */
+  .beta-step-icon {
+    display: grid; place-items: center; width: 48px; height: 48px;
+    margin: 0 auto 14px; border-radius: 14px;
+    background: var(--blue-tint); color: var(--blue-deep); font-size: 1.5rem;
+  }
+  .beta-steps b { display: block; margin-bottom: 6px; color: var(--ink); }
+  .beta-step-copy { display: block; color: var(--ink-2); font-size: 0.94rem; line-height: 1.5; }
+
+  /* Kartu hadiah: melebar penuh, ikon di kiri, lencana di kanan. Satu baris
+     mendatar supaya bacaannya satu kalimat panjang, bukan kolom sempit. */
+  .beta-reward {
+    display: grid; gap: 18px; align-items: center;
+    margin-top: clamp(28px, 4vw, 40px);
+    background: var(--blue-tint); border: 1px solid #C9DDF7; border-radius: 18px;
+    padding: clamp(22px, 3.4vw, 30px);
+  }
+  @media (min-width: 780px) {
+    .beta-reward { grid-template-columns: auto 1fr auto; gap: 24px; }
+  }
+  .beta-reward-icon {
+    display: grid; place-items: center; width: 52px; height: 52px;
+    border-radius: 14px; background: var(--surface); color: var(--blue-deep); font-size: 1.6rem;
+  }
+  .beta-reward-body h3 { color: var(--ink); margin-bottom: 6px; }
+  .beta-reward-body p { margin-bottom: 8px; }
+  .beta-reward-body p:last-child { margin-bottom: 0; }
+  /* Lencana status nyata (tidak ada pembayaran), bukan hiasan: isinya mengulang
+     satu fakta yang sudah disebut di badan kartu. */
+  .beta-reward-badge {
+    display: inline-flex; align-items: center; gap: 8px; justify-self: start;
+    background: var(--surface); border: 1px solid #C9DDF7; border-radius: 999px;
+    padding: 9px 16px; color: var(--blue-deep); font-weight: 600; font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  .beta-reward-badge .ms { font-size: 1.15rem; }
+
+  /* Baris pendaftaran: formulir di kiri, dua kartu bantuan di kanan. */
+  .beta-cta { display: grid; gap: clamp(20px, 3vw, 28px); margin-top: clamp(28px, 4vw, 40px); }
+  @media (min-width: 900px) {
+    .beta-cta { grid-template-columns: 1.35fr 1fr; gap: clamp(24px, 3vw, 32px); align-items: start; }
+  }
+
+  .beta-form {
+    display: grid; gap: 18px; text-align: left;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+    padding: clamp(22px, 4vw, 32px);
+    box-shadow: 0 12px 28px -20px rgba(13, 43, 82, 0.35);
+  }
+  .beta-form-title { font-size: 1.15rem; margin-bottom: 2px; }
+  .beta-field { display: grid; gap: 6px; }
+  .beta-field label { font-weight: 600; font-size: 0.95rem; }
+  .beta-field label span[aria-hidden] { color: var(--amber-text); }
+  .beta-field .hint { font-size: 0.85rem; color: var(--ink-2); font-weight: 400; }
+  .beta-field input[type="text"], .beta-field input[type="email"] {
+    min-height: 48px; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 12px;
+    font: 400 1rem var(--font-body); color: var(--ink); background: var(--surface); width: 100%;
+  }
+  .beta-field input::placeholder { color: var(--ink-2); opacity: 0.75; }
+  .beta-field input:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; border-color: var(--blue); }
+  /* Persetujuan dibingkai sendiri supaya terbaca sebagai satu syarat utuh yang
+     harus dicentang, bukan satu baris teks kecil yang terlewat. */
+  .beta-check {
+    display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px;
+  }
+  .beta-check input { width: 24px; height: 24px; margin-top: 2px; accent-color: var(--blue); }
+  .beta-check label { font-size: 0.92rem; color: var(--ink-2); line-height: 1.55; }
+  .beta-form .btn { width: 100%; }
+  .beta-btn-label { display: grid; gap: 1px; line-height: 1.25; }
+  .beta-btn-label small { font-weight: 500; font-size: 0.8rem; opacity: 0.85; }
+  /* Fakta singkat di bawah tombol: mengulang yang sudah dijelaskan di atas,
+     jadi bentuknya daftar ikon, bukan paragraf baru. */
+  .beta-facts {
+    list-style: none; display: flex; flex-wrap: wrap; gap: 8px 20px;
+    justify-content: center; font-size: 0.85rem; color: var(--ink-2);
+  }
+  .beta-facts li { display: inline-flex; align-items: center; gap: 6px; }
+  .beta-facts .ms { color: var(--blue-deep); font-size: 1.05rem; }
+  .beta-alt { text-align: center; font-size: 0.9rem; }
+  .beta-alt a { color: var(--blue-deep); font-weight: 600; }
+  /* Peringatan validasi: hanya muncul saat form dikirim belum lengkap. */
+  .beta-error {
+    display: none; background: #FDECEC; color: #9B1C1C; border-radius: 12px;
+    padding: 12px 14px; font-size: 0.9rem;
+  }
+  .beta-error.show { display: block; }
+
+  .beta-aside { display: grid; gap: 16px; }
+  .beta-card {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 16px;
+    padding: 20px 22px;
+  }
+  .beta-card h4 {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-display); font-size: 1rem; margin-bottom: 8px;
+  }
+  .beta-card h4 .ms { color: var(--blue-deep); font-size: 1.15rem; }
+  .beta-card p { font-size: 0.9rem; }
+  .beta-card-link {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+    margin-top: 4px; color: var(--blue-deep); font-weight: 600; font-size: 0.92rem;
+    text-decoration: none;
+  }
+  .beta-card-link:hover { text-decoration: underline; }
+  .beta-card-list { list-style: none; display: grid; gap: 10px; }
+  .beta-card-list li {
+    display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start;
+    font-size: 0.9rem; color: var(--ink-2); line-height: 1.5;
+  }
+  .beta-card-list .ms { color: var(--blue-deep); font-size: 1.05rem; margin-top: 2px; }
+
+  /* Judul section beta: baris kedua dapat warna aksen, mengikuti pola hero h1 span. */
+  .beta h2 span { color: var(--blue); }
+
+  /* Target sentuh minimum 44px (R-03). Kotak centang dan link cadangan email
+     dinaikkan ke tinggi itu tanpa mengubah tampilannya: checkbox tumbuh, link
+     dapat padding vertikal yang tidak menggeser tata letak karena
+     display-nya inline-block. */
+  .beta-check input { width: 24px; height: 24px; }
+  .beta-alt a { display: inline-block; padding: 12px 0; }
