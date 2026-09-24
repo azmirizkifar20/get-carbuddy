@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kebijakan Privasi · CarBuddy</title>
-<meta name="description" content="Kebijakan Privasi CarBuddy: catatan kendaraanmu tersimpan di HP-mu sendiri. Tanpa analitik, tanpa pelacak, tanpa telemetri. Satu-satunya koneksi keluar adalah Google Play untuk pembelian.">
+<meta name="description" content="Kebijakan Privasi CarBuddy: catatan kendaraanmu tersimpan di HP-mu sendiri. Tanpa analitik, pelacak, atau telemetri dari kami. Satu-satunya koneksi jaringan aplikasi adalah ke Google Play untuk pembelian.">
 <link rel="icon" href="images/app_icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,7 +31,7 @@
     <div class="container">
       <a class="legal-back" href="index.html"><span class="ms" aria-hidden="true">arrow_back</span>Kembali ke beranda</a>
       <h1>Kebijakan Privasi</h1>
-      <p class="legal-updated">Terakhir diperbarui: 22 September 2026</p>
+      <p class="legal-updated">Terakhir diperbarui: 24 September 2026</p>
     </div>
   </section>
 
@@ -42,10 +42,11 @@
         <h2>Daftar isi</h2>
         <ol>
           <li><a href="#ringkasan">Ringkasan singkat</a></li>
-          <li><a href="#data">Data yang kamu masukkan</a></li>
+          <li><a href="#data">Data yang disimpan aplikasi</a></li>
           <li><a href="#penyimpanan">Di mana datamu disimpan</a></li>
-          <li><a href="#pembelian">Pembelian dan langganan</a></li>
+          <li><a href="#pembelian">Pembelian dan Google Play</a></li>
           <li><a href="#izin">Izin aplikasi</a></li>
+          <li><a href="#log">Log diagnostik yang kamu kirim</a></li>
           <li><a href="#berbagi">Berbagi data ke pihak lain</a></li>
           <li><a href="#hak">Hakmu atas data</a></li>
           <li><a href="#anak">Anak-anak</a></li>
@@ -59,94 +60,118 @@
         <section id="ringkasan">
           <h2>1. Ringkasan singkat</h2>
           <p>CarBuddy adalah aplikasi pencatat kendaraan yang bekerja di HP-mu sendiri. Kami tidak punya server, tidak meminta akun, dan tidak mengumpulkan isi catatanmu.</p>
-          <p><strong>Tanpa analitik, tanpa pelacak, tanpa telemetri.</strong> Tidak ada SDK pihak ketiga yang mengirim statistik pemakaian, crash, atau perilaku. Satu-satunya koneksi keluar dari aplikasi adalah ke <strong>Google Play</strong>, untuk memproses pembelian langganan atau lisensi seumur hidup. Itu dijelaskan di bagian 4.</p>
+          <p>Aplikasi ini sendiri tidak menambahkan <strong>analitik, pelacak, maupun telemetri</strong>. Tidak ada SDK milik kami yang mengirim statistik pemakaian, laporan crash, atau perilaku ke mana pun, dan catatan kendaraanmu tidak pernah keluar dari perangkat.</p>
+          <p>Satu catatan, karena akan tidak jujur kalau ini disembunyikan: library <strong>Google Play Billing</strong> yang menangani pembelian membawa transport diagnostik milik Google sendiri, yang mengirim data teknis terbatas ke Google. Itu kode Google, bukan kode kami, kami tidak pernah menerimanya, dan dijelaskan di bagian 4.</p>
         </section>
 
         <section id="data">
-          <h2>2. Data yang kamu masukkan</h2>
-          <p>Aplikasi menyimpan apa yang kamu isi sendiri, yaitu:</p>
+          <h2>2. Data yang disimpan aplikasi</h2>
+          <p>CarBuddy menyimpan seluruh data secara lokal di perangkatmu:</p>
           <ul>
             <li>Data kendaraan: merek, model, tahun, varian, nomor polisi, nomor rangka, nomor mesin, warna, tanggal dan harga pembelian.</li>
-            <li>Catatan odometer, pengisian BBM, biaya, servis dan perawatan, pajak, serta asuransi.</li>
-            <li>Data bengkel yang kamu tambahkan.</li>
-            <li>Dokumen yang kamu lampirkan, misalnya foto STNK, kwitansi, atau faktur servis.</li>
-            <li>Nama panggilan yang kamu isi di pengaturan, kalau kamu mengisinya.</li>
+            <li>Catatan odometer, pengisian BBM, riwayat perawatan, pengeluaran, pajak, dan dokumen.</li>
+            <li>Lampiran yang kamu pilih, misalnya foto STNK, kwitansi, atau faktur servis.</li>
+            <li>Data bengkel yang kamu tambahkan, pengaturan aplikasi, dan nama panggilan kalau kamu mengisinya.</li>
           </ul>
-          <p>Semuanya adalah data yang kamu ketik atau pilih sendiri. Tidak ada satu pun yang dikirim ke kami.</p>
+          <p>Semuanya disimpan di database internal di HP-mu dan tidak pernah diunggah ke server mana pun.</p>
         </section>
 
         <section id="penyimpanan">
           <h2>3. Di mana datamu disimpan</h2>
           <p>Semua catatan disimpan di database lokal di dalam HP-mu. Tidak ada salinan di server mana pun, termasuk milik kami.</p>
-          <p>Konsekuensinya, dan ini penting untuk kamu tahu:</p>
+          <p>Dua konsekuensinya penting untuk kamu tahu:</p>
           <ul>
             <li>Kalau aplikasi dihapus, datanya ikut terhapus.</li>
             <li>Kalau HP hilang atau rusak, datanya tidak bisa kami pulihkan, karena kami memang tidak pernah memegangnya.</li>
-            <li>Karena itu sediakan <strong>Backup &amp; Pulihkan</strong> di pengaturan. Fitur itu mengekspor semua catatanmu jadi satu file yang bisa kamu simpan sendiri atau kirim ke HP baru.</li>
           </ul>
-          <p>Backup hanya berpindah kalau <strong>kamu</strong> yang memindahkannya, lewat WhatsApp, email, atau penyimpanan pilihanmu. Kami tidak terlibat, dan tidak tahu ke mana file itu pergi.</p>
+          <p><strong>Auto Backup</strong> bawaan Android dimatikan untuk CarBuddy. Database, lampiran, dan log diagnostik aplikasi juga secara eksplisit dikecualikan dari backup cloud maupun transfer antarperangkat. Jadi catatanmu tidak berpindah sendiri ke Google Drive atau ke HP baru.</p>
+          <p>Karena itu tersedia <strong>Backup &amp; Pulihkan</strong> di pengaturan. Fitur itu mengekspor semua catatanmu jadi satu file yang bisa kamu simpan sendiri atau kirim ke HP baru. Backup hanya berpindah kalau <strong>kamu</strong> yang memindahkannya, lewat WhatsApp, email, atau penyimpanan pilihanmu. Kami tidak terlibat, dan tidak tahu ke mana file itu pergi.</p>
           <div class="legal-note">
-            <p>File backup bisa dibuka dan diedit karena formatnya ZIP. Simpan di tempat yang kamu percaya, karena isinya semua catatan kendaraanmu.</p>
+            <p>File backup berformat ZIP, jadi bisa dibuka dan diedit. Simpan di tempat yang kamu percaya, karena isinya semua catatan kendaraanmu.</p>
           </div>
         </section>
 
         <section id="pembelian">
-          <h2>4. Pembelian dan langganan</h2>
-          <p>CarBuddy dijual lewat Google Play. Artinya pembayaran dan data yang menyertainya diproses oleh Google, bukan oleh kami.</p>
+          <h2>4. Pembelian dan Google Play</h2>
+          <p>CarBuddy menjual langganan tahunan dan pembelian seumur hidup sekali bayar. Setiap pembayaran diproses oleh <strong>Google Play Billing</strong>, dan hanya oleh Google Play. CarBuddy tidak punya server, jadi tidak pernah melihat dan tidak pernah menyimpan nama, nomor kartu, alamat penagihan, atau detail pembayaran lainnya.</p>
           <p>Yang diproses Google saat kamu membeli:</p>
           <ul>
             <li>Alamat email akun Google yang kamu pakai di Play.</li>
             <li>Metode pembayaran dan riwayat transaksi.</li>
             <li>Status pembelian: apakah langgananmu aktif, diperpanjang, dibatalkan, atau dikembalikan.</li>
           </ul>
-          <p>Kami <strong>tidak menerima</strong> nomor kartu, alamat penagihan, atau data pembayaran apa pun. Yang sampai ke aplikasi hanya satu hal: status pembelian dari Google Play, yang dipakai untuk membuka akses. Status itu disimpan di HP-mu bersama catatan lain.</p>
-          <p>Data pembelian ditangani sesuai <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Kebijakan Privasi Google</a> dan <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Ketentuan Layanan Google</a>. Cara Google memproses pembayaran di luar kendali kami.</p>
-          <p><strong>Penting:</strong> menambahkan pembelian <em>tidak</em> menambahkan analitik apa pun. Tidak ada SDK baru yang mengirim data ke mana-mana. Satu-satunya perubahan adalah aplikasi kini berbicara dengan Google Play untuk memeriksa lisensi, dan itu hanya soal pembelian, bukan perilaku pemakaianmu.</p>
+          <p>Yang diterima CarBuddy dari Google Play hanya sebatas yang dibutuhkan untuk membuka aplikasi: produk apa yang kamu beli, apakah masih aktif, dan token pembelian buram yang dipakai Google untuk mengenali pembelian itu. Token tersebut hanya disimpan di HP-mu, tidak pernah diunggah ke mana pun, dan dipakai semata-mata untuk memeriksa hak aksesmu ke Google Play.</p>
+          <p>Google memproses data pembelianmu di bawah <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Kebijakan Privasi Google</a>, yang di luar kendali CarBuddy.</p>
+          <h3>Diagnostik penagihan Google</h3>
+          <p>Google Play Billing membawa logging dan transport diagnostik milik Google sendiri (library <code>datatransport</code> dan <code>play-services-base</code>). Terlepas dari CarBuddy, library itu bisa mengirim data teknis ke Google soal koneksi penagihannya sendiri, misalnya versi library Play Billing, nama paket dan versi aplikasi, pengenal per-pemasangan, serta berhasil atau gagalnya sebuah panggilan penagihan. Google memakainya untuk memantau keandalan Play Billing.</p>
+          <p>Artinya dalam praktik:</p>
+          <ul>
+            <li>Itu library Google dan aliran data Google. CarBuddy tidak punya akses ke sana dan tidak pernah menerima salinannya.</li>
+            <li>Isinya bukan catatan kendaraan, bukan entri odometer atau BBM, bukan lampiran, dan bukan apa pun yang kamu ketik di aplikasi.</li>
+            <li>Tidak bisa dimatikan dari CarBuddy, karena itu bagian dari library penagihan yang diwajibkan Play untuk pembelian.</li>
+            <li>Google menanganinya di bawah kebijakan privasi yang tertaut di atas.</li>
+          </ul>
+          <p>Membeli tidak menambahkan <strong>analitik, pelacak, maupun telemetri dari kami</strong>. Satu-satunya koneksi jaringan aplikasi adalah ke Google Play: untuk menyelesaikan pembelian, dan memastikan apakah pembelian masih aktif. Membuka halaman langganan Play dari pengaturan adalah tautan keluar (lihat bagian 5).</p>
         </section>
 
         <section id="izin">
           <h2>5. Izin aplikasi</h2>
           <ul>
             <li><strong>Notifikasi</strong>: untuk mengingatkan jadwal servis, pajak, dan perpanjangan lainnya. Dijadwalkan di HP-mu sendiri, tidak lewat server.</li>
-            <li><strong>Penyimpanan atau file</strong>: untuk menyimpan foto lampiran dan file backup yang kamu pilih sendiri.</li>
-            <li><strong>Internet</strong>: dipakai untuk pembelian lewat Google Play dan untuk memeriksa status lisensi. Tidak dipakai untuk mengirim catatanmu.</li>
+            <li><strong>File</strong>: untuk menyimpan lampiran yang kamu pilih dan file backup yang kamu ekspor atau pulihkan. Aplikasi memakai pemilih file bawaan Android, jadi tidak meminta izin penyimpanan dan tidak bisa menelusuri file-mu sendiri.</li>
+            <li><strong>Internet dan status jaringan</strong>: dipakai untuk pembelian lewat Google Play dan untuk memeriksa status lisensi. Tidak dipakai untuk mengirim catatanmu ke mana pun. Kedua izin ini berasal dari library penagihan Google, bukan dari kode CarBuddy sendiri.</li>
           </ul>
-          <p>Aplikasi tidak meminta akses ke kontak, lokasi, kamera, atau mikrofon.</p>
+          <p>Aplikasi tidak meminta akses ke lokasi, kontak, kamera, atau mikrofon.</p>
+          <p>Font aplikasi dibundel di dalamnya dan tidak pernah diunduh saat aplikasi berjalan. Saat kamu mengetuk tautan keluar, misalnya halaman langganan Play, WhatsApp atau peta sebuah bengkel, atau tautan di dalam dokumen, alamatnya diserahkan ke browser atau aplikasi terkait. Itu penjelajahan biasa di bawah kebijakan layanan tersebut, dan CarBuddy tidak mengirim apa pun bersamanya.</p>
+        </section>
+
+        <section id="log">
+          <h2>6. Log diagnostik yang kamu pilih untuk kirim</h2>
+          <p>CarBuddy menyimpan file log bergulir di HP-mu untuk membantu menelusuri crash dan error. Log itu tidak pernah dikirim ke mana pun secara otomatis.</p>
+          <p>Log hanya keluar dari HP-mu ketika kamu mengetuk salah satu dari dua entri di Pengaturan → Tentang:</p>
+          <ul>
+            <li><strong>Export Debug Logs</strong> membuka aplikasi email-mu sendiri dengan log terlampir, dialamatkan ke pengembang. Kalau tidak ada aplikasi email, yang terbuka adalah menu bagikan di HP-mu, dan kamu sendiri yang memilih tujuan file-nya.</li>
+            <li><strong>Bantuan &amp; Masalah</strong> membuka email bantuan ke pengembang dengan log yang sama terlampir, supaya laporan masalah datang bersama bahan untuk menelusurinya. Lampirannya bisa kamu hapus sebelum mengirim.</li>
+          </ul>
+          <p>Isinya entri teknis, yaitu pesan error, stack trace, detail penjadwalan notifikasi, dan catatan peristiwa aplikasi, yang bisa memuat nama kendaraan, nilai odometer, dan path file yang pernah kamu pakai. Isinya tidak memuat konten lampiranmu.</p>
+          <p>Tidak ada yang terkirim sampai kamu menekan kirim di aplikasi email. <strong>Hapus semua data</strong> di pengaturan menghapus log beserta semua salinan hasil ekspornya. Kalau kamu lebih suka tidak membagikan log, hapus lampirannya dari email bantuan sebelum mengirim.</p>
         </section>
 
         <section id="berbagi">
-          <h2>6. Berbagi data ke pihak lain</h2>
+          <h2>7. Berbagi data ke pihak lain</h2>
           <p>Kami tidak menjual, menyewakan, atau membagikan datamu ke siapa pun, karena kami tidak memilikinya sejak awal.</p>
           <p>Dua pengecualian, dan keduanya atas kehendakmu sendiri:</p>
           <ul>
-            <li><strong>Google Play</strong> memproses pembelian seperti dijelaskan di bagian 4.</li>
-            <li><strong>Kamu sendiri</strong> yang mengirim file backup atau lampiran ke aplikasi lain ketika memilih melakukannya.</li>
+            <li><strong>Google Play</strong> memproses pembelian seperti dijelaskan di bagian 4, termasuk diagnostik dari library penagihannya sendiri.</li>
+            <li><strong>Kamu sendiri</strong> yang mengirim file backup, lampiran, atau log diagnostik ke aplikasi lain ketika memilih melakukannya.</li>
           </ul>
+          <p>Selain penagihan Google Play, CarBuddy tidak melakukan pemrosesan data oleh pihak ketiga mana pun, dan tidak ada pemrosesan berbasis cloud atas catatan kendaraanmu. Dukungan lewat email sepenuhnya kamu mulai sendiri dari aplikasi email di HP-mu, dan hanya menyertakan informasi yang kamu pilih untuk diberikan atau dilampirkan.</p>
         </section>
 
         <section id="hak">
-          <h2>7. Hakmu atas data</h2>
+          <h2>8. Hakmu atas data</h2>
           <p>Karena semua data ada di HP-mu dan di bawah kendalimu, kamu tidak perlu mengajukan permintaan ke kami untuk mengakses atau menghapusnya:</p>
           <ul>
             <li><strong>Melihat dan mengubah</strong>: langsung di aplikasi, kapan saja.</li>
             <li><strong>Mengekspor</strong>: lewat Backup &amp; Pulihkan, dalam satu file.</li>
-            <li><strong>Menghapus</strong>: lewat Reset Data di pengaturan, atau dengan menghapus aplikasinya.</li>
+            <li><strong>Menghapus</strong>: lewat Hapus semua data di pengaturan, atau dengan menghapus aplikasinya.</li>
           </ul>
           <p>Penghapusan bersifat permanen dan tidak bisa dibatalkan. Kami tidak bisa mengembalikannya karena kami tidak punya salinannya.</p>
+          <p>Menghapus aplikasi tidak membatalkan langganan, karena langganan melekat pada akun Google Play-mu, bukan pada aplikasinya. Kelola atau batalkan di Google Play lewat menu <strong>Langganan</strong>. Hal yang sama berlaku untuk pembelian seumur hidup: pembelian itu tetap melekat pada akun Google-mu, jadi memasang ulang aplikasi, atau memasangnya di perangkat lain dengan akun yang sama, akan memulihkan aksesmu lewat <strong>Pulihkan pembelian</strong>.</p>
         </section>
 
         <section id="anak">
-          <h2>8. Anak-anak</h2>
+          <h2>9. Anak-anak</h2>
           <p>CarBuddy bukan aplikasi untuk anak-anak dan tidak ditujukan untuk pengguna di bawah 13 tahun. Kami tidak dengan sengaja mengumpulkan data dari anak-anak, dan memang tidak mengumpulkan data pribadi siapa pun.</p>
         </section>
 
         <section id="perubahan">
-          <h2>9. Perubahan kebijakan ini</h2>
+          <h2>10. Perubahan kebijakan ini</h2>
           <p>Kalau kebijakan ini berubah, tanggal di bagian atas halaman akan ikut diperbarui. Untuk perubahan yang memengaruhi caramu memakai aplikasi, kami akan menampilkan pemberitahuan di dalam aplikasi sebelum perubahan itu berlaku.</p>
         </section>
 
         <section id="kontak">
-          <h2>10. Kontak</h2>
+          <h2>11. Kontak</h2>
           <p>Ada pertanyaan soal privasi di CarBuddy? Hubungi:</p>
           <!-- TODO(T0.2b): ganti [NAMA LEGAL] dengan nama persis seperti di Payments
                profile Google Play. Play menampilkan nama itu di listing, jadi
