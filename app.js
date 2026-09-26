@@ -13,7 +13,7 @@ const SCREENSHOTS = [
   },
   {
     src: 'images/insights.jpg',
-    alt: 'Tab Insights dengan kartu jarak tempuh, efisiensi BBM 48,3 km/L, total pengeluaran, dan grafik tren',
+    alt: 'Tab Insights dengan kartu jarak tempuh, efisiensi BBM 35,0 km/L, total pengeluaran, dan prediksi isi BBM berikutnya',
     caption: 'Insight: jarak, konsumsi, dan pengeluaran per kendaraan, lengkap dengan trennya.'
   },
   {
